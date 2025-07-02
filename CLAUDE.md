@@ -85,7 +85,8 @@
 
 ### 動作確認済みコマンド
 - `pnpm run lint`: Biome.jsでのコードチェック ✅
-- `pnpm run lint:fix`: 自動修正 ✅  
+- `pnpm run lint:fix`: 自動修正 ✅
+- `pnpm run typecheck`: TypeScript型チェック ✅
 - `pnpm run build`: プロダクションビルド ✅
 - `pnpm run dev`: 開発サーバー起動（http://localhost:5173/） ✅
 - `pnpm run test`: Vitestでテスト実行（watchモード） ✅
