@@ -73,6 +73,10 @@
 - 型推論の積極的活用
 - 型安全でない箇所の明確なドキュメント化
 - 機能追加・変更時のドキュメント更新必須
+- **型定義の統一化**: 同じ構造の型定義が複数ファイルに散らばることを防ぐため、共通の型は`types.ts`ファイルに集約し、各ファイルからimportして使用する
+- **構造化されたファイル構成**: 複雑なコンポーネントは専用ディレクトリを作成し、子コンポーネントと適切にスコープを分離する
+- **説明変数の適切な使用**: 意味のある説明変数は積極的に使用し、不要な単純代入は避ける
+- **状態オブジェクトの適切な命名**: メインデータを基準とした命名を行い、抽象的な接尾語を避ける
 
 ## プロジェクト初期化での注意点
 
@@ -121,10 +125,22 @@
 ```
 src/
 ├── calendar/
-│   ├── index.tsx                  # コンポーネント本体
-│   ├── useCalendarData.ts         # カレンダー関連のhooks
-│   ├── CalendarTypes.ts           # カレンダー関連の型定義
-│   └── CalendarUtils.ts           # カレンダー関連のユーティリティ
+│   ├── index.tsx                  # メインコンポーネント
+│   ├── useCalendarState.ts        # カレンダー状態管理hooks
+│   ├── types.ts                   # カレンダー関連の型定義（共通型含む）
+│   ├── utils.ts                   # カレンダー関連のユーティリティ
+│   ├── mockData.ts               # モックデータと関連ユーティリティ
+│   ├── CalendarHeader.tsx        # ヘッダーコンポーネント
+│   ├── TimeColumn.tsx            # 時間軸コンポーネント
+│   ├── familyMemberColumn/       # 家族メンバー関連
+│   │   ├── index.tsx            # 家族メンバーメインコンポーネント
+│   │   └── EventDisplay.tsx     # イベント表示子コンポーネント
+│   ├── TodayButton.tsx           # 今日ボタンコンポーネント
+│   ├── LoadingIndicator.tsx      # ローディング表示コンポーネント
+│   ├── settingsModal/           # 設定モーダル関連
+│   │   ├── index.tsx            # 設定モーダルメインコンポーネント
+│   │   └── TimeRangeInput.tsx   # 時間範囲入力子コンポーネント
+│   └── useTouchNavigation.ts     # タッチナビゲーションhooks
 ├── family/
 │   ├── FamilyMember.tsx          # 家族メンバーコンポーネント
 │   ├── useFamilySettings.ts      # 家族設定のhooks
@@ -148,6 +164,97 @@ src/
     ├── CalendarTypes.ts
     └── FamilyTypes.ts
 ```
+
+### 構造化されたファイル構成の指針
+
+複雑なコンポーネントや関連する子コンポーネントがある場合は、専用ディレクトリを作成して適切にスコープを分離します。
+
+**適用基準**:
+- コンポーネントが複数の子コンポーネントを持つ場合
+- 子コンポーネントが親コンポーネント専用で他から参照されない場合
+- 重複するロジックを子コンポーネントとして抽出できる場合
+
+**構造化の例**:
+```
+src/calendar/settingsModal/
+├── index.tsx            # メインコンポーネント（SettingsModal）
+├── TimeRangeInput.tsx   # 専用子コンポーネント
+└── types.ts            # 必要に応じてモーダル専用の型定義
+```
+
+**メリット**:
+- 適切なスコープ分離（子コンポーネントが外部に公開されない）
+- コードの重複排除と保守性向上
+- テスト容易性の向上
+- 機能の凝集度向上
+
+### 説明変数の適切な使用指針
+
+コードの可読性向上のため、説明変数は適切に使用し、不要な代入は避けます。
+
+**✅ 使用すべき例**:
+```typescript
+// 計算結果に意味のある名前を付ける
+const duration = event.endHour - event.startHour;
+const height = duration * cellHeight;
+const topPosition = (event.startHour - startHour) * cellHeight + headerHeight;
+
+// 複雑な条件式を分かりやすくする
+const isOverlapping = newEvent.startTime < existingEvent.endTime;
+const isSameDay = format(date1, 'yyyy-MM-dd') === format(date2, 'yyyy-MM-dd');
+
+// 長いプロパティアクセスを短縮し、意味を明確にする
+const screenHeight = window.innerHeight;
+const availableHeight = screenHeight - reservedHeight;
+```
+
+**❌ 避けるべき例**:
+```typescript
+// 単純な代入で意味が変わらない
+const eventStartHour = event.startHour; // ❌ 不要
+const userName = user.name;             // ❌ 不要
+
+// 文字数も変わらず、意味も同じ
+const id = item.id;                     // ❌ 不要
+const title = data.title;               // ❌ 不要
+```
+
+**判断基準**:
+- **計算や変換が含まれる** → 説明変数を使用
+- **意味的に異なる概念を表現する** → 説明変数を使用  
+- **単純なプロパティアクセスの別名** → 直接使用
+- **文字数がほぼ同じで意味も同じ** → 直接使用
+
+### 状態オブジェクトの適切な命名指針
+
+状態をグループ化する際は、メインとなるデータを基準とした命名を行い、そのデータが「何のため」に使われるのかを明確にします。
+
+**✅ 適切な命名例**:
+```typescript
+// メインデータを基準とした命名
+currentDate: { date, isDateChanging }           // メイン: 現在の日付
+swipe: { startX, setStartX }                    // 目的: スワイプ操作
+cell: { startHour, endHour, cellHeight, headerHeight } // 目的: セルレンダリング
+settingsModal: { isOpen, setIsOpen }           // 目的: 設定モーダル制御
+settingsControl: { setStartHour, setEndHour }  // 目的: 設定値変更
+actions: { goToPreviousDay, goToNextDay, goToToday } // 役割: アクション群
+```
+
+**❌ 避けるべき命名例**:
+```typescript
+// 抽象的で目的が不明確
+dateState: { currentDate, isDateChanging }     // ❌ State接尾語は冗長
+touchState: { startX, setStartX }              // ❌ 何のタッチか不明
+layoutState: { startHour, endHour, ... }      // ❌ 何のレイアウトか不明
+modalState: { isSettingsOpen, ... }           // ❌ どのモーダルか不明
+```
+
+**命名原則**:
+1. **メインデータを基準にする**: オブジェクトの主要な値から命名
+2. **目的・用途を明確にする**: そのデータが何のために使われるかを表現
+3. **具体性を重視する**: `touch`より`swipe`、`layout`より`cell`
+4. **冗長な接尾語を避ける**: `State`、`Data`などの汎用的な接尾語は除く
+5. **データ重複を避ける**: 同じデータが複数のオブジェクトに含まれないよう設計
 
 ### エラーハンドリング
 

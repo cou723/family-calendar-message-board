@@ -1,7 +1,7 @@
-import { SimpleCalendarTest } from "./SimpleCalendarTest";
+import { Calendar } from "./calendar";
 
 function App() {
-	return <SimpleCalendarTest />;
+	return <Calendar />;
 }
 
 export default App;
