@@ -6,6 +6,46 @@ export const SimpleCalendarTest = () => {
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [startX, setStartX] = useState<number | null>(null);
 	const [isDateChanging, setIsDateChanging] = useState(false);
+	const [cellHeight, setCellHeight] = useState(32);
+	const [headerHeight, setHeaderHeight] = useState(48);
+	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+	const [startHour, setStartHour] = useState(6);
+	const [endHour, setEndHour] = useState(23);
+
+	// 画面サイズに応じてセルの高さを動的に計算
+	useEffect(() => {
+		const calculateCellHeight = () => {
+			const screenHeight = window.innerHeight;
+			
+			// 固定される部分の高さを正確に計算（余裕を持った値）
+			const topHeaderHeight = 110; // 日付ヘッダー部分（実測ベース + 余裕）
+			const safetyMargin = 10; // 安全マージン
+			const reservedHeight = topHeaderHeight + safetyMargin;
+			
+			const availableHeight = screenHeight - reservedHeight;
+			const totalHours = endHour - startHour + 1; // 動的な時間範囲
+			const totalRowsIncludingHeader = totalHours + 1; // 時間セル + グリッドヘッダー
+			
+			// 利用可能高さを全行数で分割（グリッドヘッダーも含む）
+			const averageRowHeight = Math.floor(availableHeight / totalRowsIncludingHeader);
+			
+			// セル高さとヘッダー高さを計算（最小値保証）
+			const finalCellHeight = Math.max(18, averageRowHeight);
+			const finalHeaderHeight = Math.max(35, averageRowHeight);
+			
+			setCellHeight(finalCellHeight);
+			setHeaderHeight(finalHeaderHeight);
+		};
+
+		calculateCellHeight();
+		window.addEventListener('resize', calculateCellHeight);
+		window.addEventListener('orientationchange', calculateCellHeight);
+
+		return () => {
+			window.removeEventListener('resize', calculateCellHeight);
+			window.removeEventListener('orientationchange', calculateCellHeight);
+		};
+	}, [startHour, endHour]);
 
 	const goToPreviousDay = () => {
 		setIsDateChanging(true);
@@ -28,7 +68,9 @@ export const SimpleCalendarTest = () => {
 	};
 
 	const goToToday = () => {
+		setIsDateChanging(true);
 		setCurrentDate(new Date());
+		setTimeout(() => setIsDateChanging(false), 300);
 	};
 
 	// スワイプイベント処理
@@ -99,73 +141,49 @@ export const SimpleCalendarTest = () => {
 
 	return (
 		<div 
-			className="h-screen bg-gray-100 flex flex-col"
+			className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden"
 			onTouchStart={handleTouchStart}
 			onTouchEnd={handleTouchEnd}
 		>
 			{/* ヘッダー - 固定高さ */}
-			<div className="bg-white shadow-sm p-3 flex-shrink-0">
-				<div className="flex items-center justify-between">
-					<button
-						onClick={goToPreviousDay}
-						className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-lg"
-					>
-						← 前日
-					</button>
-					
-					<div className={`text-center px-4 py-2 rounded-lg border-2 transition-all duration-300 ${
-						isDateChanging 
-							? "bg-green-100 border-green-300 scale-105" 
-							: "bg-blue-50 border-blue-200"
+			<div className="bg-white shadow-sm p-4 flex-shrink-0 relative">
+				<div className={`text-center px-6 py-4 rounded-lg transition-all duration-300 ${
+					isDateChanging 
+						? "bg-green-100 scale-105" 
+						: "bg-blue-50"
+				}`}>
+					<h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold ${
+						isDateChanging ? "text-green-800" : "text-blue-800"
 					}`}>
-						<h1 className={`text-2xl font-bold ${
-							isDateChanging ? "text-green-800" : "text-blue-800"
-						}`}>
-							{format(currentDate, "yyyy年M月d日", { locale: ja })}
-						</h1>
-						<p className={`text-lg font-semibold ${
-							isDateChanging ? "text-green-600" : "text-blue-600"
-						}`}>
-							({format(currentDate, "EEEE", { locale: ja })})
-						</p>
-						{isDateChanging && (
-							<p className="text-sm text-green-700 mt-1">
-								📅 日付変更中...
-							</p>
-						)}
-					</div>
-
-					<button
-						onClick={goToNextDay}
-						className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-lg"
-					>
-						翌日 →
-					</button>
+						{format(currentDate, "yyyy年M月d日", { locale: ja })} ({format(currentDate, "EEEE", { locale: ja })})
+					</h1>
 				</div>
-				
-				<div className="text-center mt-2">
-					<button
-						onClick={goToToday}
-						className="px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-					>
-						今日
-					</button>
-					<span className="ml-4 text-sm text-gray-600">
-						← 左右にスワイプで日付変更 →
-					</span>
-				</div>
+				{/* 設定ボタン */}
+				<button
+					onClick={() => setIsSettingsOpen(true)}
+					className="absolute top-4 right-4 w-12 h-12 bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 rounded-xl flex items-center justify-center text-gray-700 hover:text-gray-900 transition-all shadow-sm hover:shadow-md"
+				>
+					<span className="text-lg">⚙️</span>
+				</button>
 			</div>
 
 			{/* カレンダーグリッド - 残り画面を使用 */}
-			<div className="flex-1 overflow-hidden">
-				<div className="h-full flex bg-white">
+			<div className="flex-1 overflow-hidden min-h-0">
+				<div className="h-full w-full flex bg-white overflow-auto">
 					{/* 時間軸 */}
-					<div className="w-20 bg-gray-50 border-r-2 border-gray-300">
-						<div className="font-bold text-center py-2 border-b-2 border-gray-200 text-sm bg-gray-100">
+					<div className="w-20 sm:w-24 bg-blue-50 border-r-2 border-blue-200 flex-shrink-0">
+						<div 
+							className="font-bold text-center border-b-2 border-blue-200 text-base sm:text-lg bg-blue-100 text-blue-900 flex items-center justify-center"
+							style={{ height: `${headerHeight}px` }}
+						>
 							時間
 						</div>
-						{Array.from({ length: 18 }, (_, i) => i + 6).map(hour => (
-							<div key={`time-${hour}`} className="h-8 border-b border-gray-200 text-center text-xs py-1 flex items-center justify-center font-medium">
+						{Array.from({ length: endHour - startHour + 1 }, (_, i) => i + startHour).map(hour => (
+							<div 
+								key={`time-${hour}`} 
+								className="border-b border-blue-200 text-center text-base sm:text-lg text-blue-800 flex items-center justify-center font-medium"
+								style={{ height: `${cellHeight}px` }}
+							>
 								{hour}:00
 							</div>
 						))}
@@ -178,41 +196,48 @@ export const SimpleCalendarTest = () => {
 						{ member: "son1", name: "長男", bgColor: "bg-green-100" },
 						{ member: "son2", name: "次男", bgColor: "bg-yellow-100" }
 					].map(({ member, name, bgColor }) => (
-						<div key={member} className="flex-1 border-r border-gray-200 relative">
+						<div key={member} className="flex-1 min-w-0 border-r border-blue-200 relative">
 							{/* ヘッダー */}
-							<div className={`${bgColor} font-bold text-center py-2 border-b-2 border-gray-200 text-sm`}>
+							<div 
+								className={`${bgColor} font-bold text-center border-b-2 border-blue-200 text-base sm:text-lg text-gray-800 flex items-center justify-center`}
+								style={{ height: `${headerHeight}px` }}
+							>
 								{name}
 							</div>
 
 							{/* 時間スロットの背景 */}
-							{Array.from({ length: 18 }, (_, i) => i + 6).map(hour => (
-								<div key={`bg-${member}-${hour}`} className="h-8 border-b border-gray-200" />
+							{Array.from({ length: endHour - startHour + 1 }, (_, i) => i + startHour).map(hour => (
+								<div 
+									key={`bg-${member}-${hour}`} 
+									className="border-b border-blue-200" 
+									style={{ height: `${cellHeight}px` }}
+								/>
 							))}
 
 							{/* イベント表示（絶対位置） */}
 							{mockEvents
 								.filter(event => event.member === member)
 								.map((event, index) => {
-									const startHour = event.startHour;
+									const eventStartHour = event.startHour;
 									const duration = event.endHour - event.startHour;
-									const topPosition = (startHour - 6) * 32 + 32; // ヘッダー分の32px追加
-									const height = duration * 32; // 1時間=32px
+									const topPosition = (eventStartHour - startHour) * cellHeight + headerHeight;
+									const height = duration * cellHeight;
 
 									return (
 										<div
 											key={`event-${member}-${index}`}
-											className={`absolute left-1 right-1 ${event.color} text-white rounded text-xs px-2 py-1 shadow-sm z-10`}
+											className={`absolute left-1 right-1 ${event.color} text-white rounded text-sm sm:text-base lg:text-lg px-2 sm:px-3 py-1 sm:py-2 shadow-sm z-10 overflow-hidden`}
 											style={{
 												top: `${topPosition}px`,
 												height: `${height}px`,
-												minHeight: '24px'
+												minHeight: `${Math.max(20, cellHeight * 0.8)}px`
 											}}
 										>
-											<div className="font-semibold leading-tight">
+											<div className="font-semibold leading-tight truncate">
 												{event.title}
 											</div>
-											<div className="text-xs opacity-90 leading-tight">
-												{startHour}:00-{event.endHour}:00
+											<div className="text-xs sm:text-sm lg:text-base opacity-90 leading-tight">
+												{eventStartHour}:00-{event.endHour}:00
 											</div>
 										</div>
 									);
@@ -222,12 +247,73 @@ export const SimpleCalendarTest = () => {
 				</div>
 			</div>
 
-			{/* フッター - 固定高さ */}
-			<div className="bg-white p-2 flex-shrink-0 border-t border-gray-200">
-				<div className="text-center text-gray-600 text-sm">
-					🧪 家族カレンダー - 6:00〜23:00 | スワイプで日付変更
+			{/* フローティング今日ボタン */}
+			<button
+				onClick={goToToday}
+				className="fixed bottom-6 right-6 w-14 h-14 bg-white hover:bg-blue-50 border-2 border-blue-200 hover:border-blue-300 text-blue-600 hover:text-blue-800 rounded-full shadow-lg hover:shadow-xl flex items-center justify-center text-2xl z-50 transition-all"
+			>
+				📅
+			</button>
+
+			{/* フローティングローダー */}
+			{isDateChanging && (
+				<div className="fixed bottom-6 left-6 bg-white border-2 border-gray-200 rounded-full p-3 shadow-lg z-50">
+					<div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
 				</div>
-			</div>
+			)}
+
+			{/* 設定モーダル */}
+			{isSettingsOpen && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setIsSettingsOpen(false)}>
+					<div className="bg-white rounded-lg p-6 w-80 max-w-md" onClick={(e) => e.stopPropagation()}>
+						<h2 className="text-xl font-bold mb-4 text-center">表示設定</h2>
+						
+						<div className="space-y-4">
+							<div>
+								<label className="block text-sm font-medium text-gray-700 mb-2">
+									開始時間: {startHour}:00
+								</label>
+								<input
+									type="range"
+									min="0"
+									max="23"
+									value={startHour}
+									onChange={(e) => setStartHour(Number(e.target.value))}
+									className="w-full"
+								/>
+							</div>
+
+							<div>
+								<label className="block text-sm font-medium text-gray-700 mb-2">
+									終了時間: {endHour}:00
+								</label>
+								<input
+									type="range"
+									min="0"
+									max="23"
+									value={endHour}
+									onChange={(e) => setEndHour(Number(e.target.value))}
+									className="w-full"
+								/>
+							</div>
+
+							<div className="text-sm text-gray-600 text-center">
+								表示時間: {endHour - startHour + 1}時間
+							</div>
+						</div>
+
+						<div className="flex justify-end space-x-2 mt-6">
+							<button
+								onClick={() => setIsSettingsOpen(false)}
+								className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+							>
+								閉じる
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+
 		</div>
 	);
 };
