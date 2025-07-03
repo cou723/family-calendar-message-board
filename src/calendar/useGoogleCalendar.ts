@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AuthClient } from "../api/auth";
 import { useCalendarEvents } from "./queries/useCalendarEvents";
 import type { FamilyCalendarConfig } from "./types";
@@ -20,11 +20,13 @@ export const useGoogleCalendar = (currentDate: Date) => {
 			if (saved) {
 				const parsed = JSON.parse(saved);
 				// 旧形式（calendarId）から新形式（calendarIds）への移行
-				return parsed.map((config: any) => {
-					if (config.calendarId && !config.calendarIds) {
+				return parsed.map((config: FamilyCalendarConfig) => {
+					if ("calendarId" in config && !config.calendarIds) {
 						return {
 							...config,
-							calendarIds: [config.calendarId],
+							calendarIds: [
+								(config as unknown as { calendarId: string }).calendarId,
+							],
 						};
 					}
 					return config;
@@ -63,12 +65,7 @@ export const useGoogleCalendar = (currentDate: Date) => {
 		];
 	});
 
-	// 認証状態の初期チェック
-	useEffect(() => {
-		checkAuthStatus();
-	}, []);
-
-	const checkAuthStatus = async () => {
+	const checkAuthStatus = useCallback(async () => {
 		try {
 			const authenticated = await authClient.checkAuthStatus();
 			setIsAuthenticated(authenticated);
@@ -82,7 +79,12 @@ export const useGoogleCalendar = (currentDate: Date) => {
 			setUseMockData(true);
 			setAuthError("認証状態の確認に失敗しました。モックデータを使用します。");
 		}
-	};
+	}, []);
+
+	// 認証状態の初期チェック
+	useEffect(() => {
+		checkAuthStatus();
+	}, [checkAuthStatus]);
 
 	// TanStack Queryを使ってイベントを取得
 	const {

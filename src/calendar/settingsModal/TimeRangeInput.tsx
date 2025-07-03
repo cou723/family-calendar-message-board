@@ -11,10 +11,14 @@ export const TimeRangeInput = ({
 }: TimeRangeInputProps) => {
 	return (
 		<div>
-			<label className="block text-sm font-medium text-gray-700 mb-2">
+			<label
+				htmlFor={`time-range-${label}`}
+				className="block text-sm font-medium text-gray-700 mb-2"
+			>
 				{label}: {value}:00
 			</label>
 			<input
+				id={`time-range-${label}`}
 				type="range"
 				min="0"
 				max="23"

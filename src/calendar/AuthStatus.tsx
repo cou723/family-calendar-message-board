@@ -20,6 +20,7 @@ export const AuthStatus = ({
 		return onLogout ? (
 			<div className="fixed top-4 left-4 z-40">
 				<button
+					type="button"
 					onClick={onLogout}
 					className="bg-red-500 text-white px-3 py-1 rounded text-sm font-medium hover:bg-red-600 transition-colors"
 				>
@@ -56,6 +57,7 @@ export const AuthStatus = ({
 
 							{!isAuthenticated && !useMockData && (
 								<button
+									type="button"
 									onClick={onAuthenticate}
 									className="w-full bg-blue-500 text-white px-4 py-2 rounded text-base font-semibold hover:bg-blue-600 transition-colors"
 								>
@@ -65,6 +67,7 @@ export const AuthStatus = ({
 
 							{useMockData && (
 								<button
+									type="button"
 									onClick={onAuthenticate}
 									className="w-full bg-green-500 text-white px-4 py-2 rounded text-base font-semibold hover:bg-green-600 transition-colors"
 								>

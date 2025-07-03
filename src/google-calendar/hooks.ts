@@ -131,7 +131,7 @@ export const useFamilyCalendarData = (
 		} finally {
 			setIsLoading(false);
 		}
-	}, [targetDate, isSignedIn, actualFetcher, api]);
+	}, [targetDate, isSignedIn, actualFetcher, api, fetcher]);
 
 	// targetDateが変更されたら自動でリロード
 	useEffect(() => {

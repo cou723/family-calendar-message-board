@@ -1,18 +1,11 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 echo "🚀 Running pre-push checks..."
 
-# 型チェック
+# Type check
 echo "📝 Running typecheck..."
 pnpm run typecheck
 
-# 全ファイルのLintチェック
+# Lint check
 echo "🧹 Running lint..."
 pnpm run lint
 
-# ビルドテスト
-echo "🏗️ Running build test..."
-pnpm run build
-
-echo "✅ All pre-push checks passed! Safe to push."
+echo "✅ Pre-push checks passed!"

@@ -1,5 +1,10 @@
 import { FAMILY_MEMBERS } from "./config";
-import type { CalendarDataFetcher, DateRange, ProcessedEvent } from "./types";
+import type {
+	CalendarDataFetcher,
+	CalendarEvent,
+	DateRange,
+	ProcessedEvent,
+} from "./types";
 
 // モック用の予定データ
 const createMockEvent = (
@@ -122,7 +127,7 @@ export const createMockDataFetcher = (): CalendarDataFetcher => ({
 				end: event.isAllDay
 					? { date: targetDate.toISOString().split("T")[0] }
 					: { dateTime: event.endTime.toISOString() },
-			})) as any; // Google API形式に合わせる
+			})) as CalendarEvent[]; // Google API形式に合わせる
 	},
 	getCurrentDate: () => new Date(),
 });

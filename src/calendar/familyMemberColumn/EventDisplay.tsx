@@ -28,7 +28,11 @@ export const EventDisplay = ({
 
 					return (
 						<div
-							key={event.id || `event-${member}-${index}`}
+							key={
+								event.id
+									? `event-${event.id}`
+									: `event-${member}-${index}-${event.title}-${event.startHour}`
+							}
 							className={`absolute left-1 right-1 ${event.color} text-white rounded text-base px-3 py-2 shadow-sm z-10 overflow-hidden`}
 							style={{
 								top: `${topPosition}px`,

@@ -22,7 +22,7 @@ export const CalendarSelector = ({
 		if (calendars.length === 0 && !isLoading && !error) {
 			fetchCalendarList();
 		}
-	}, [calendars.length, isLoading, error]);
+	}, [calendars.length, isLoading, error, fetchCalendarList]);
 
 	const handleRefresh = () => {
 		fetchCalendarList();
@@ -71,6 +71,7 @@ export const CalendarSelector = ({
 				</select>
 
 				<button
+					type="button"
 					onClick={handleRefresh}
 					disabled={isLoading}
 					className="flex-shrink-0 px-2 py-2 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors min-w-[2.5rem]"

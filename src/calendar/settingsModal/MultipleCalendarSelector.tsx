@@ -33,17 +33,17 @@ export const MultipleCalendarSelector = ({
 	return (
 		<div className="space-y-3">
 			<div className="flex items-center justify-between">
-				<label className="text-base font-medium text-gray-700">
-					{memberName}
-				</label>
+				<div className="text-base font-medium text-gray-700">{memberName}</div>
 				<div className="flex gap-2">
 					<button
+						type="button"
 						onClick={addCalendar}
 						className="text-sm text-green-600 hover:text-green-800 transition-colors px-2 py-1 border border-green-600 rounded hover:bg-green-50"
 					>
 						+ カレンダー追加
 					</button>
 					<button
+						type="button"
 						onClick={resetToDefault}
 						className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
 					>
@@ -54,7 +54,10 @@ export const MultipleCalendarSelector = ({
 
 			<div className="space-y-2">
 				{calendarIds.map((calendarId, index) => (
-					<div key={index} className="flex items-start gap-2">
+					<div
+						key={`calendar-${index}-${calendarId}`}
+						className="flex items-start gap-2"
+					>
 						<div className="flex-1">
 							<CalendarSelector
 								value={calendarId}
@@ -66,6 +69,7 @@ export const MultipleCalendarSelector = ({
 						</div>
 						{calendarIds.length > 1 && (
 							<button
+								type="button"
 								onClick={() => removeCalendar(index)}
 								className="flex-shrink-0 mt-2 p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
 								title="このカレンダーを削除"

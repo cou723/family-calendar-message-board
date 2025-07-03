@@ -31,17 +31,32 @@ export const SettingsModal = ({
 	return (
 		<div
 			className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+			role="dialog"
+			aria-modal="true"
 			onClick={() => setIsSettingsOpen(false)}
+			onKeyDown={(e) => {
+				if (e.key === "Escape") {
+					setIsSettingsOpen(false);
+				}
+			}}
+			tabIndex={-1}
 		>
 			<div
 				className="bg-white rounded-lg p-6 w-[32rem] max-w-2xl max-h-[80vh] overflow-y-auto"
+				role="document"
 				onClick={(e) => e.stopPropagation()}
+				onKeyDown={(e) => {
+					if (e.key === "Escape") {
+						setIsSettingsOpen(false);
+					}
+				}}
 			>
 				<h2 className="text-xl font-bold mb-4 text-center">設定</h2>
 
 				{/* タブメニュー */}
 				<div className="flex border-b border-gray-200 mb-6">
 					<button
+						type="button"
 						onClick={() => setActiveTab("time")}
 						className={`flex-1 px-4 py-2 text-center font-medium transition-colors ${
 							activeTab === "time"
@@ -52,6 +67,7 @@ export const SettingsModal = ({
 						表示時間
 					</button>
 					<button
+						type="button"
 						onClick={() => setActiveTab("calendar")}
 						className={`flex-1 px-4 py-2 text-center font-medium transition-colors ${
 							activeTab === "calendar"
@@ -95,6 +111,7 @@ export const SettingsModal = ({
 
 				<div className="flex justify-end space-x-2 mt-6">
 					<button
+						type="button"
 						onClick={() => setIsSettingsOpen(false)}
 						className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
 					>

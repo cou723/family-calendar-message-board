@@ -31,6 +31,7 @@ export const CalendarHeader = ({
 
 			{/* 設定ボタン */}
 			<button
+				type="button"
 				onClick={() => setIsSettingsOpen(true)}
 				className="absolute top-4 right-4 w-12 h-12 bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 rounded-xl flex items-center justify-center text-gray-700 hover:text-gray-900 transition-all shadow-sm hover:shadow-md"
 			>

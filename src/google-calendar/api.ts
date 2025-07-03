@@ -55,7 +55,7 @@ export class GoogleCalendarApi {
 			const authInstance = gapi.auth2.getAuthInstance();
 			await authInstance.signIn();
 			this.isSignedIn = true;
-		} catch (error) {
+		} catch {
 			throw this.createError("PERMISSION_ERROR", "認証に失敗しました");
 		}
 	}
