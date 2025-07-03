@@ -4,21 +4,19 @@ import {
 	initializeGapi,
 	isAuthenticated,
 } from "./gapiAuth";
-import { fetchGapiMultipleCalendarEvents } from "./gapiCalendarApi";
-import { mockEvents } from "./mockData";
-import type { CalendarEvent, FamilyCalendarConfig } from "./types";
+import { useCalendarEvents } from "./queries/useCalendarEvents";
+import type { FamilyCalendarConfig } from "./types";
 
-export const useGoogleCalendar = () => {
+export const useGoogleCalendar = (currentDate: Date) => {
 	const [isAuthenticating, setIsAuthenticating] = useState(false);
 	const [authError, setAuthError] = useState<string | null>(null);
-	const [events, setEvents] = useState<CalendarEvent[]>([]);
-	const [isLoadingEvents, setIsLoadingEvents] = useState(false);
-	const [eventsError, setEventsError] = useState<string | null>(null);
 	const [isGapiInitialized, setIsGapiInitialized] = useState(false);
 	const [useMockData, setUseMockData] = useState(false);
 
 	// 家族メンバーのカレンダー設定（ローカルストレージから読み込み）
-	const [familyCalendars, setFamilyCalendars] = useState<FamilyCalendarConfig[]>(() => {
+	const [familyCalendars, setFamilyCalendars] = useState<
+		FamilyCalendarConfig[]
+	>(() => {
 		try {
 			const saved = localStorage.getItem("familyCalendarSettings");
 			if (saved) {
@@ -37,7 +35,7 @@ export const useGoogleCalendar = () => {
 		} catch (error) {
 			console.error("ローカルストレージからの設定読み込みエラー:", error);
 		}
-		
+
 		// デフォルト設定
 		return [
 			{
@@ -48,7 +46,7 @@ export const useGoogleCalendar = () => {
 			},
 			{
 				member: "mother",
-				calendarIds: [import.meta.env.VITE_MOTHER_CALENDAR_ID || "primary"], 
+				calendarIds: [import.meta.env.VITE_MOTHER_CALENDAR_ID || "primary"],
 				name: "お母さん",
 				bgColor: "bg-red-100",
 			},
@@ -65,6 +63,19 @@ export const useGoogleCalendar = () => {
 				bgColor: "bg-yellow-100",
 			},
 		];
+	});
+
+	// TanStack Queryを使ってイベントを取得
+	const {
+		data: events = [],
+		isLoading: isLoadingEvents,
+		error: eventsError,
+		refetch: refetchEvents,
+	} = useCalendarEvents({
+		date: currentDate,
+		familyCalendars,
+		useMockData,
+		enabled: isGapiInitialized && (useMockData || isAuthenticated()),
 	});
 
 	/**
@@ -126,73 +137,24 @@ export const useGoogleCalendar = () => {
 	};
 
 	/**
-	 * 指定日のイベントを取得
+	 * イベントを手動で再取得（TanStack Queryのrefetchを使用）
 	 */
-	const loadEvents = async (date: Date): Promise<void> => {
-		setIsLoadingEvents(true);
-		setEventsError(null);
-
-		try {
-			if (useMockData || !isAuthenticated()) {
-				// モックデータを使用（CalendarEvent型に変換）
-				console.log("モックデータを使用します");
-				const calendarEvents: CalendarEvent[] = mockEvents.map((event) => ({
-					...event,
-					id: event.id || `mock-${Math.random()}`,
-					description: event.description || "",
-					location: event.location || "",
-				}));
-				setEvents(calendarEvents);
-				return;
-			}
-
-			// 各家族メンバーの複数カレンダーを展開
-			const calendarConfigs: { calendarId: string; member: string }[] = [];
-			familyCalendars.forEach((familyConfig) => {
-				familyConfig.calendarIds.forEach((calendarId) => {
-					calendarConfigs.push({
-						calendarId,
-						member: familyConfig.member,
-					});
-				});
-			});
-
-			const fetchedEvents = await fetchGapiMultipleCalendarEvents(
-				calendarConfigs,
-				date,
-			);
-			setEvents(fetchedEvents);
-		} catch (error) {
-			const errorMessage =
-				error instanceof Error ? error.message : "Unknown error";
-			console.warn(
-				`イベント取得エラー: ${errorMessage}、モックデータを使用します`,
-			);
-			setEventsError(
-				`イベント取得エラー: ${errorMessage}、モックデータを使用します`,
-			);
-
-			// エラー時はモックデータを使用（CalendarEvent型に変換）
-			const calendarEvents: CalendarEvent[] = mockEvents.map((event) => ({
-				...event,
-				id: event.id || `mock-${Math.random()}`,
-				description: event.description || "",
-				location: event.location || "",
-			}));
-			setEvents(calendarEvents);
-			setUseMockData(true);
-		} finally {
-			setIsLoadingEvents(false);
-		}
+	const loadEvents = async (): Promise<void> => {
+		refetchEvents();
 	};
 
 	/**
 	 * 家族カレンダー設定を更新
 	 */
-	const updateFamilyCalendars = (newCalendars: FamilyCalendarConfig[]): void => {
+	const updateFamilyCalendars = (
+		newCalendars: FamilyCalendarConfig[],
+	): void => {
 		setFamilyCalendars(newCalendars);
 		try {
-			localStorage.setItem("familyCalendarSettings", JSON.stringify(newCalendars));
+			localStorage.setItem(
+				"familyCalendarSettings",
+				JSON.stringify(newCalendars),
+			);
 		} catch (error) {
 			console.error("ローカルストレージへの設定保存エラー:", error);
 		}
@@ -208,7 +170,7 @@ export const useGoogleCalendar = () => {
 		// イベント関連
 		events,
 		isLoadingEvents,
-		eventsError,
+		eventsError: eventsError ? `イベント取得エラー: ${eventsError}` : null,
 		loadEvents,
 
 		// 設定・状態

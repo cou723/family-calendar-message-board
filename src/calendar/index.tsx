@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { AuthStatus } from "./AuthStatus";
 import { CalendarHeader } from "./CalendarHeader";
+import { EventsLoadingPlaceholder } from "./EventsLoadingPlaceholder";
 import { FamilyMemberColumn } from "./familyMemberColumn";
 import { LoadingIndicator } from "./LoadingIndicator";
 import { SettingsModal } from "./settingsModal";
@@ -25,7 +26,6 @@ export const Calendar = () => {
 	const {
 		events,
 		isLoadingEvents,
-		loadEvents,
 		isAuthenticated,
 		authenticate,
 		authError,
@@ -33,7 +33,7 @@ export const Calendar = () => {
 		useMockData,
 		familyCalendars,
 		updateFamilyCalendars,
-	} = useGoogleCalendar();
+	} = useGoogleCalendar(currentDate.date);
 
 	const cell = {
 		...timeRange,
@@ -55,12 +55,7 @@ export const Calendar = () => {
 		bgColor: calendar.bgColor,
 	}));
 
-	// 日付が変更されたときにイベントを読み込み
-	useEffect(() => {
-		if (isAuthenticated) {
-			loadEvents(currentDate.date);
-		}
-	}, [currentDate.date, isAuthenticated]);
+	// TanStack Queryが日付変更を自動的に検知するため、useEffectは不要
 
 	// アプリ起動時に認証チェック
 	useEffect(() => {
@@ -88,15 +83,22 @@ export const Calendar = () => {
 					{/* 時間軸 */}
 					<TimeColumn cellLayout={cell} />
 
-					{/* 家族メンバーカラム */}
-					{familyMembers.map((familyMember) => (
-						<FamilyMemberColumn
-							key={familyMember.member}
-							familyMember={familyMember}
+					{/* 家族メンバーカラム（ローディング時は専用表示） */}
+					{isLoadingEvents ? (
+						<EventsLoadingPlaceholder
 							cellLayout={cell}
-							events={events}
+							familyMembers={familyMembers}
 						/>
-					))}
+					) : (
+						familyMembers.map((familyMember) => (
+							<FamilyMemberColumn
+								key={familyMember.member}
+								familyMember={familyMember}
+								cellLayout={cell}
+								events={events}
+							/>
+						))
+					)}
 				</div>
 			</div>
 

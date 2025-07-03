@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { TimeRangeInput } from "./TimeRangeInput";
-import { CalendarSettingsTab } from "./CalendarSettingsTab";
 import type { FamilyCalendarConfig } from "../types";
+import { CalendarSettingsTab } from "./CalendarSettingsTab";
+import { TimeRangeInput } from "./TimeRangeInput";
 
 interface SettingsModalProps {
 	isSettingsOpen: boolean;

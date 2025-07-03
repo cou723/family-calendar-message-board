@@ -58,7 +58,9 @@ export const MultipleCalendarSelector = ({
 						<div className="flex-1">
 							<CalendarSelector
 								value={calendarId}
-								onChange={(newCalendarId) => updateCalendar(index, newCalendarId)}
+								onChange={(newCalendarId) =>
+									updateCalendar(index, newCalendarId)
+								}
 								placeholder={`${memberName}のカレンダー ${index + 1}`}
 							/>
 						</div>
@@ -77,7 +79,8 @@ export const MultipleCalendarSelector = ({
 
 			{calendarIds.length > 1 && (
 				<div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
-					💡 複数のカレンダーが設定されています。すべてのカレンダーのイベントがマージして表示されます。
+					💡
+					複数のカレンダーが設定されています。すべてのカレンダーのイベントがマージして表示されます。
 				</div>
 			)}
 		</div>

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useCalendarList } from "../useCalendarList";
 import type { GoogleCalendarInfo } from "../types";
+import { useCalendarList } from "../useCalendarList";
 
 interface CalendarSelectorProps {
 	value: string;
@@ -30,16 +30,20 @@ export const CalendarSelector = ({
 
 	const formatCalendarOption = (calendar: GoogleCalendarInfo): string => {
 		let displayName = calendar.summary;
-		
+
 		if (calendar.primary) {
 			displayName += " (メイン)";
 		}
-		
+
 		// アクセス権限の表示
-		const roleText = calendar.accessRole === "owner" ? "オーナー" : 
-						calendar.accessRole === "writer" ? "編集者" : "閲覧者";
+		const roleText =
+			calendar.accessRole === "owner"
+				? "オーナー"
+				: calendar.accessRole === "writer"
+					? "編集者"
+					: "閲覧者";
 		displayName += ` - ${roleText}`;
-		
+
 		return displayName;
 	};
 
@@ -52,14 +56,20 @@ export const CalendarSelector = ({
 					disabled={disabled || isLoading}
 					className="flex-1 px-3 py-2 border border-gray-300 rounded text-base text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
 				>
-					<option value="" className="text-gray-500">{placeholder}</option>
+					<option value="" className="text-gray-500">
+						{placeholder}
+					</option>
 					{calendars.map((calendar) => (
-						<option key={calendar.id} value={calendar.id} className="text-gray-900">
+						<option
+							key={calendar.id}
+							value={calendar.id}
+							className="text-gray-900"
+						>
 							{formatCalendarOption(calendar)}
 						</option>
 					))}
 				</select>
-				
+
 				<button
 					onClick={handleRefresh}
 					disabled={isLoading}
@@ -78,11 +88,7 @@ export const CalendarSelector = ({
 				</div>
 			)}
 
-			{error && (
-				<div className="text-sm text-red-600">
-					{error}
-				</div>
-			)}
+			{error && <div className="text-sm text-red-600">{error}</div>}
 
 			{!isLoading && !error && calendars.length === 0 && (
 				<div className="text-sm text-gray-600">

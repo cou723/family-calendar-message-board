@@ -49,7 +49,11 @@ export const fetchGapiMultipleCalendarEvents = async (
 ): Promise<CalendarEvent[]> => {
 	try {
 		const eventPromises = calendarConfigs.map(async (config) => {
-			const events = await fetchGapiCalendarEvents(config.calendarId, date, config.member);
+			const events = await fetchGapiCalendarEvents(
+				config.calendarId,
+				date,
+				config.member,
+			);
 			// メンバー情報はすでに設定済み
 			return events;
 		});
@@ -77,9 +81,11 @@ function convertGoogleEventToCalendarEvent(
 	const endTime = parseGoogleDateTime(end);
 
 	const eventColor = getEventColor(member);
-	
+
 	// デバッグ用ログ
-	console.log(`イベント変換: member=${member}, color=${eventColor}, title=${summary}, calendarId=${calendarId}`);
+	console.log(
+		`イベント変換: member=${member}, color=${eventColor}, title=${summary}, calendarId=${calendarId}`,
+	);
 
 	return {
 		id: googleEvent.id || "",

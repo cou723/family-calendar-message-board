@@ -10,7 +10,10 @@ export const CalendarSettingsTab = ({
 	familyCalendars,
 	onUpdateCalendars,
 }: CalendarSettingsTabProps) => {
-	const handleCalendarIdsChange = (member: string, newCalendarIds: string[]) => {
+	const handleCalendarIdsChange = (
+		member: string,
+		newCalendarIds: string[],
+	) => {
 		const updatedCalendars = familyCalendars.map((calendar) =>
 			calendar.member === member
 				? { ...calendar, calendarIds: newCalendarIds }
@@ -26,10 +29,7 @@ export const CalendarSettingsTab = ({
 			</div>
 
 			{familyCalendars.map((calendar) => (
-				<div
-					key={calendar.member}
-					className="bg-gray-50 rounded-lg p-4"
-				>
+				<div key={calendar.member} className="bg-gray-50 rounded-lg p-4">
 					<MultipleCalendarSelector
 						calendarIds={calendar.calendarIds}
 						onChange={(newCalendarIds) =>
