@@ -34,29 +34,29 @@ export const useGoogleCalendar = (currentDate: Date) => {
 			console.error("ローカルストレージからの設定読み込みエラー:", error);
 		}
 
-		// デフォルト設定
+		// デフォルト設定（設定モーダルから変更可能）
 		return [
 			{
 				member: "father",
-				calendarIds: [import.meta.env.VITE_FATHER_CALENDAR_ID || "primary"],
+				calendarIds: ["primary"],
 				name: "お父さん",
 				bgColor: "bg-blue-100",
 			},
 			{
 				member: "mother",
-				calendarIds: [import.meta.env.VITE_MOTHER_CALENDAR_ID || "primary"],
+				calendarIds: ["primary"],
 				name: "お母さん",
 				bgColor: "bg-red-100",
 			},
 			{
 				member: "son1",
-				calendarIds: [import.meta.env.VITE_SON1_CALENDAR_ID || "primary"],
+				calendarIds: ["primary"],
 				name: "長男",
 				bgColor: "bg-green-100",
 			},
 			{
 				member: "son2",
-				calendarIds: [import.meta.env.VITE_SON2_CALENDAR_ID || "primary"],
+				calendarIds: ["primary"],
 				name: "次男",
 				bgColor: "bg-yellow-100",
 			},
