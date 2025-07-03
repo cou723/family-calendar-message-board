@@ -33,6 +33,7 @@ export const Calendar = () => {
 		useMockData,
 		familyCalendars,
 		updateFamilyCalendars,
+		logout,
 	} = useGoogleCalendar(currentDate.date);
 
 	const cell = {
@@ -127,6 +128,7 @@ export const Calendar = () => {
 				authError={authError}
 				useMockData={useMockData}
 				onAuthenticate={authenticate}
+				onLogout={logout}
 			/>
 		</div>
 	);

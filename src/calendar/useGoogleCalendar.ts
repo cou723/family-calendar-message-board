@@ -3,6 +3,7 @@ import {
 	authenticateGoogle,
 	initializeGapi,
 	isAuthenticated,
+	logout,
 } from "./gapiAuth";
 import { useCalendarEvents } from "./queries/useCalendarEvents";
 import type { FamilyCalendarConfig } from "./types";
@@ -144,6 +145,16 @@ export const useGoogleCalendar = (currentDate: Date) => {
 	};
 
 	/**
+	 * ログアウト処理
+	 */
+	const handleLogout = () => {
+		logout();
+		setUseMockData(true);
+		setAuthError(null);
+		setIsGapiInitialized(false);
+	};
+
+	/**
 	 * 家族カレンダー設定を更新
 	 */
 	const updateFamilyCalendars = (
@@ -166,6 +177,7 @@ export const useGoogleCalendar = (currentDate: Date) => {
 		isAuthenticating,
 		authError,
 		authenticate,
+		logout: handleLogout,
 
 		// イベント関連
 		events,
