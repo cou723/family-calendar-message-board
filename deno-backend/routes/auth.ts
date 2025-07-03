@@ -16,11 +16,11 @@ import {
 	getSessionIdFromCookie,
 } from "../lib/utils.ts";
 
-const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID")!;
-const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET")!;
+const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID") || "";
+const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET") || "";
 const BASE_URL = Deno.env.get("BASE_URL") || "http://localhost:8000";
 
-export async function handleLogin(request: Request): Promise<Response> {
+export async function handleLogin(_request: Request): Promise<Response> {
 	const state = generateSecureRandomString(32);
 	const codeVerifier = generateCodeVerifier();
 	const codeChallenge = await generateCodeChallenge(codeVerifier);
@@ -76,7 +76,7 @@ export async function handleCallback(request: Request): Promise<Response> {
 	try {
 		const tokenResponse = await exchangeCodeForTokens({
 			code,
-			codeVerifier: session.codeVerifier!,
+			codeVerifier: session.codeVerifier || "",
 			clientId: GOOGLE_CLIENT_ID,
 			clientSecret: GOOGLE_CLIENT_SECRET,
 			redirectUri: `${BASE_URL}/api/auth/callback`,

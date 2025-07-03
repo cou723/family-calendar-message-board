@@ -36,7 +36,7 @@ export async function fetchCalendarEvents(
 	return data.items || [];
 }
 
-export async function fetchCalendarList(): Promise<any[]> {
+export async function fetchCalendarList(): Promise<unknown[]> {
 	const response = await fetch(`${API_BASE_URL}/api/calendar/list`, {
 		credentials: "include",
 	});

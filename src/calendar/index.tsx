@@ -62,7 +62,7 @@ export const Calendar = () => {
 		if (!isAuthenticated) {
 			authenticate();
 		}
-	}, []);
+	}, [isAuthenticated, authenticate]);
 
 	return (
 		<div

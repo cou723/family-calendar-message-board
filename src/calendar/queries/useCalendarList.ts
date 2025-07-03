@@ -12,12 +12,15 @@ export const useCalendarListQuery = (enabled: boolean) => {
 
 			// プライマリカレンダーを最初に配置し、残りは名前順でソート
 			return calendarList
-				.map((calendar: any) => ({
-					id: calendar.id,
-					summary: calendar.summary || calendar.id,
-					primary: calendar.primary || false,
-					accessRole: calendar.accessRole || "reader",
-					backgroundColor: calendar.backgroundColor,
+				.map((calendar: unknown) => {
+					const cal = calendar as Record<string, unknown>;
+					return {
+						id: cal.id as string,
+						summary: (cal.summary as string) || (cal.id as string),
+						primary: (cal.primary as boolean) || false,
+						accessRole: (cal.accessRole as string) || "reader",
+						backgroundColor: cal.backgroundColor as string,
+					};
 				}))
 				.sort((a: GoogleCalendarInfo, b: GoogleCalendarInfo) => {
 					if (a.primary) return -1;

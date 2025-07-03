@@ -2,8 +2,8 @@ import { refreshAccessToken } from "../lib/google-auth.ts";
 import { getSession, updateSession } from "../lib/session.ts";
 import { getSessionIdFromCookie } from "../lib/utils.ts";
 
-const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID")!;
-const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET")!;
+const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID") || "";
+const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET") || "";
 
 async function ensureValidToken(sessionId: string): Promise<string | null> {
 	const session = await getSession(sessionId);
