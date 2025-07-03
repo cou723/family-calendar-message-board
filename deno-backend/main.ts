@@ -1,4 +1,8 @@
+import { load } from "https://deno.land/std@0.208.0/dotenv/mod.ts";
 import { handleRequest } from "./routes/index.ts";
+
+// .envファイルを読み込み
+await load({ export: true });
 
 const PORT = parseInt(Deno.env.get("PORT") || "8000");
 
@@ -13,5 +17,4 @@ console.log(
 
 Deno.serve({
 	port: PORT,
-	handler: handleRequest,
-});
+}, handleRequest);

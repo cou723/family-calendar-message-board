@@ -9,7 +9,11 @@ import { handleCalendarEvents, handleCalendarList } from "./calendar.ts";
 
 export async function handleRequest(request: Request): Promise<Response> {
 	const url = new URL(request.url);
-	const { pathname, method } = new URL(request.url);
+	const pathname = url.pathname;
+	const method = request.method;
+	
+	// デバッグログ
+	console.log(`📥 ${method} ${pathname}`);
 
 	// CORS設定
 	const corsHeaders = {

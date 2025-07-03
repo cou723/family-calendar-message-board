@@ -1,12 +1,13 @@
 {
 	"compilerOptions": {
-		"allowJs": true,
-		"lib": ["deno.window"],
+		"lib": [
+			"deno.window"
+		],
 		"strict": true
 	},
 	"tasks": {
-		"dev": "deno run --allow-net --allow-env --allow-read --watch main.ts",
-		"start": "deno run --allow-net --allow-env --allow-read main.ts"
+		"dev": "deno run --allow-net --allow-env --allow-read --unstable-kv --watch main.ts",
+		"start": "deno run --allow-net --allow-env --allow-read --unstable-kv main.ts"
 	},
 	"imports": {
 		"std/": "https://deno.land/std@0.208.0/"
