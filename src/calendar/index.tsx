@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { AuthStatus } from "./AuthStatus";
 import { CalendarHeader } from "./CalendarHeader";
+import { CurrentTimeDisplay } from "./CurrentTimeDisplay";
 import { EventsLoadingPlaceholder } from "./EventsLoadingPlaceholder";
 import { FamilyMemberColumn } from "./familyMemberColumn";
 import { SettingsModal } from "./settingsModal";
@@ -100,6 +101,9 @@ export const Calendar = () => {
 					)}
 				</div>
 			</div>
+
+			{/* 現在時刻表示 */}
+			<CurrentTimeDisplay />
 
 			{/* フローティングボタン */}
 			<TodayButton goToToday={actions.goToToday} />
