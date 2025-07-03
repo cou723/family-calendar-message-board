@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import type { GoogleCalendarInfo } from "../types";
-import { useCalendarList } from "../useCalendarList";
+import { useCalendarList } from "../../data/useCalendarList";
+import type { GoogleCalendarInfo } from "../../shared/types";
 
 interface CalendarSelectorProps {
 	value: string;

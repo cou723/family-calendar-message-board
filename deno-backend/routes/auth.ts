@@ -19,6 +19,8 @@ import {
 const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID") || "";
 const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET") || "";
 const BASE_URL = Deno.env.get("BASE_URL") || "http://localhost:8000";
+const FRONTEND_URL = Deno.env.get("FRONTEND_URL") || "http://localhost:5173";
+const IS_DEVELOPMENT = Deno.env.get("DENO_ENV") === "development" || BASE_URL.includes("localhost");
 
 export async function handleLogin(_request: Request): Promise<Response> {
 	const state = generateSecureRandomString(32);
@@ -35,11 +37,16 @@ export async function handleLogin(_request: Request): Promise<Response> {
 		scope: "https://www.googleapis.com/auth/calendar.readonly",
 	});
 
+	// 開発環境ではSecureフラグを除外
+	const cookieOptions = IS_DEVELOPMENT 
+		? `session_id=${sessionId}; HttpOnly; SameSite=Lax; Max-Age=86400; Path=/`
+		: `session_id=${sessionId}; HttpOnly; Secure; SameSite=Strict; Max-Age=86400; Path=/`;
+
 	return new Response(null, {
 		status: 302,
 		headers: {
 			Location: authUrl,
-			"Set-Cookie": `session_id=${sessionId}; HttpOnly; Secure; SameSite=Strict; Max-Age=86400; Path=/`,
+			"Set-Cookie": cookieOptions,
 		},
 	});
 }
@@ -50,6 +57,12 @@ export async function handleCallback(request: Request): Promise<Response> {
 	const state = url.searchParams.get("state");
 	const error = url.searchParams.get("error");
 
+	console.log("🔍 Callback debug info:");
+	console.log("- URL:", url.toString());
+	console.log("- Code:", code ? "✅ Present" : "❌ Missing");
+	console.log("- State:", state ? "✅ Present" : "❌ Missing");
+	console.log("- Cookie header:", request.headers.get("Cookie"));
+
 	if (error) {
 		return new Response(`Authentication error: ${error}`, { status: 400 });
 	}
@@ -59,12 +72,16 @@ export async function handleCallback(request: Request): Promise<Response> {
 	}
 
 	const sessionId = getSessionIdFromCookie(request);
+	console.log("- Session ID:", sessionId ? "✅ Found" : "❌ Not found");
+	
 	if (!sessionId) {
 		return new Response("No session found", { status: 400 });
 	}
 
 	const session = await getSession(sessionId);
+	console.log("- Session data:", session);
 	if (!session) {
+		console.log("❌ Session not found in database");
 		return new Response("Invalid session", { status: 400 });
 	}
 
@@ -74,6 +91,7 @@ export async function handleCallback(request: Request): Promise<Response> {
 	}
 
 	try {
+		console.log("🔄 Exchanging code for tokens...");
 		const tokenResponse = await exchangeCodeForTokens({
 			code,
 			codeVerifier: session.codeVerifier || "",
@@ -81,7 +99,9 @@ export async function handleCallback(request: Request): Promise<Response> {
 			clientSecret: GOOGLE_CLIENT_SECRET,
 			redirectUri: `${BASE_URL}/api/auth/callback`,
 		});
+		console.log("✅ Token exchange successful");
 
+		console.log("💾 Updating session with authentication data...");
 		await updateSession(sessionId, {
 			accessToken: tokenResponse.access_token,
 			refreshToken: tokenResponse.refresh_token,
@@ -90,10 +110,17 @@ export async function handleCallback(request: Request): Promise<Response> {
 			state: undefined,
 			codeVerifier: undefined,
 		});
+		console.log("✅ Session updated successfully");
+		
+		// 更新後のセッションデータを確認
+		const updatedSession = await getSession(sessionId);
+		console.log("📊 Updated session data:", updatedSession);
 
+		console.log("✅ Authentication successful, redirecting to:", FRONTEND_URL);
+		
 		return new Response(null, {
 			status: 302,
-			headers: { Location: "/" },
+			headers: { Location: FRONTEND_URL },
 		});
 	} catch (error) {
 		console.error("Token exchange error:", error);
@@ -107,25 +134,39 @@ export async function handleLogout(request: Request): Promise<Response> {
 		await deleteSession(sessionId);
 	}
 
+	// 開発環境ではSecureフラグを除外してCookieを削除
+	const clearCookieOptions = IS_DEVELOPMENT 
+		? "session_id=; HttpOnly; SameSite=Lax; Max-Age=0; Path=/"
+		: "session_id=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/";
+
 	return new Response(JSON.stringify({ success: true }), {
 		headers: {
 			"Content-Type": "application/json",
-			"Set-Cookie":
-				"session_id=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/",
+			"Set-Cookie": clearCookieOptions,
 		},
 	});
 }
 
 export async function handleAuthStatus(request: Request): Promise<Response> {
+	console.log("🔍 Auth status check:");
+	console.log("- Cookie header:", request.headers.get("Cookie"));
+	
 	const sessionId = getSessionIdFromCookie(request);
+	console.log("- Session ID:", sessionId || "❌ Not found");
+	
 	if (!sessionId) {
+		console.log("❌ No session ID found");
 		return new Response(JSON.stringify({ authenticated: false }), {
 			headers: { "Content-Type": "application/json" },
 		});
 	}
 
 	const session = await getSession(sessionId);
+	console.log("- Session found:", session ? "✅ Yes" : "❌ No");
+	console.log("- Session authenticated:", session?.authenticated ? "✅ Yes" : "❌ No");
+	
 	if (!session?.authenticated) {
+		console.log("❌ Session not authenticated");
 		return new Response(JSON.stringify({ authenticated: false }), {
 			headers: { "Content-Type": "application/json" },
 		});
@@ -163,6 +204,7 @@ export async function handleAuthStatus(request: Request): Promise<Response> {
 		}
 	}
 
+	console.log("✅ Auth status check successful - user is authenticated");
 	return new Response(JSON.stringify({ authenticated: true }), {
 		headers: { "Content-Type": "application/json" },
 	});

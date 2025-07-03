@@ -25,11 +25,22 @@ export async function updateSession(
 	sessionId: string,
 	updates: Partial<Session>,
 ): Promise<void> {
+	console.log("🔧 Session update - ID:", sessionId);
+	console.log("🔧 Session update - Updates:", updates);
+	
 	const existing = await getSession(sessionId);
-	if (!existing) throw new Error("Session not found");
+	if (!existing) {
+		console.error("❌ Session not found for update:", sessionId);
+		throw new Error("Session not found");
+	}
+	
+	console.log("🔧 Session update - Existing:", existing);
 
 	const updated = { ...existing, ...updates };
+	console.log("🔧 Session update - Final data:", updated);
+	
 	await kv.set(["sessions", sessionId], updated, { expireIn: 86400000 });
+	console.log("✅ Session successfully saved to KV store");
 }
 
 export async function deleteSession(sessionId: string): Promise<void> {

@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchCalendarList } from "../../api/calendar";
-import type { GoogleCalendarInfo } from "../types";
+import { fetchCalendarList } from "../../../api/calendar";
+import type { GoogleCalendarInfo } from "../../shared/types";
 
 export const useCalendarListQuery = (enabled: boolean) => {
 	const queryClient = useQueryClient();

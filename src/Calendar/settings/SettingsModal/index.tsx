@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { FamilyCalendarConfig } from "../types";
+import type { FamilyCalendarConfig } from "../../shared/types";
 import { CalendarSettingsTab } from "./CalendarSettingsTab";
 import { TimeRangeInput } from "./TimeRangeInput";
 

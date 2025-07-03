@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { CellLayout } from "./types";
+import type { CellLayout } from "../shared/types";
 import { getTimeColumnBackgroundClass } from "./utils/cellBackgroundUtils";
 
 interface TimeColumnProps {

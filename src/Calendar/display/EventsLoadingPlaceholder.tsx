@@ -1,4 +1,4 @@
-import type { CellLayout, FamilyMember } from "./types";
+import type { CellLayout, FamilyMember } from "../shared/types";
 
 interface EventsLoadingPlaceholderProps {
 	cellLayout: CellLayout;

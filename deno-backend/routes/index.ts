@@ -14,10 +14,22 @@ export async function handleRequest(request: Request): Promise<Response> {
 
 	// デバッグログ
 	console.log(`📥 ${method} ${pathname}`);
+	if (pathname === "/") {
+		console.log("🏠 Root access detected - will redirect to frontend");
+	}
 
-	// CORS設定
+	// CORS設定 - 開発環境ではlocalhostからのアクセスを許可
+	const allowedOrigins = [
+		"http://localhost:5173", // Vite開発サーバー
+		"http://localhost:3000", // 代替ポート
+		"https://family-calendar-message-board.vercel.app", // プロダクション
+	];
+	
+	const origin = request.headers.get("Origin");
+	const allowOrigin = allowedOrigins.includes(origin || "") ? origin : allowedOrigins[0];
+
 	const corsHeaders = {
-		"Access-Control-Allow-Origin": "*",
+		"Access-Control-Allow-Origin": allowOrigin || "*",
 		"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 		"Access-Control-Allow-Headers": "Content-Type, Authorization",
 		"Access-Control-Allow-Credentials": "true",
@@ -51,6 +63,13 @@ export async function handleRequest(request: Request): Promise<Response> {
 					headers: { "Content-Type": "application/json" },
 				},
 			);
+		} else if (pathname === "/" && method === "GET") {
+			// ルートアクセス時はフロントエンドにリダイレクト
+			const frontendUrl = Deno.env.get("FRONTEND_URL") || "http://localhost:5173";
+			response = new Response(null, {
+				status: 302,
+				headers: { Location: frontendUrl },
+			});
 		} else {
 			response = new Response("Not Found", { status: 404 });
 		}

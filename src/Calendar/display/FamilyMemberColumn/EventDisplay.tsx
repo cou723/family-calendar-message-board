@@ -1,5 +1,5 @@
-import type { CalendarEvent } from "../types";
-import { formatTime } from "../utils";
+import type { CalendarEvent } from "../../shared/types";
+import { formatTime } from "../../shared/utils";
 
 interface EventDisplayProps {
 	member: string;

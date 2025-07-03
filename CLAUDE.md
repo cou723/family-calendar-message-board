@@ -97,6 +97,11 @@
 - `pnpm run test:run`: Vitestでテスト実行（一回のみ） ✅
 - `pnpm run test:ui`: Vitestテスト実行（UIモード） ✅
 
+### 重要な開発ルール
+- **pre-commit hookの回避は絶対禁止**: `--no-verify`フラグなどでpre-commit hookを回避してはいけません
+- コミット前に必ずlintとtypecheckが通ることを確認してください
+- エラーがある場合は修正してからコミットしてください
+
 ### テスト環境
 - **テストフレームワーク**: Vitest 3.2.4
 - **テスティングライブラリ**: React Testing Library 16.3.0
@@ -125,50 +130,124 @@
 
 ## コーディングスタイル
 
-### ディレクトリ構造
+### フォルダ構造設計
 
-ディレクトリ構造はcomponentsやhooksなど機械的に分けるのではなく領域ごとに分けてください。
+フォルダ構造はコンポーネントとその関連ファイルで整理してください。
 
-**推奨構造**:
+#### ファイル配置の判断基準
+
+ファイルの配置は以下の判断フローに従って決定します：
+
+1. **単一コンポーネント専用か？** → YES: コンポーネントフォルダ内に配置
+2. **特定の責任領域か？** → YES: 該当責任領域フォルダに配置  
+3. **複数領域で共有か？** → YES: shared/に配置
+
+#### フォルダの分類例
+
+- `auth/` - 認証・ログイン関連
+- `data/` - API通信・データ取得関連
+- `display/` - UI表示・レンダリング関連
+- `settings/` - 設定・構成管理関連
+- `components/` - 子コンポーネント群の整理
+- `shared/` - 複数領域で使用される共通要素
+
+#### 現在の推奨構造
+
 ```
-src/
-├── calendar/
-│   ├── index.tsx                  # メインコンポーネント
-│   ├── useCalendarState.ts        # カレンダー状態管理hooks
-│   ├── types.ts                   # カレンダー関連の型定義（共通型含む）
-│   ├── utils.ts                   # カレンダー関連のユーティリティ
-│   ├── mockData.ts               # モックデータと関連ユーティリティ
-│   ├── CalendarHeader.tsx        # ヘッダーコンポーネント
-│   ├── TimeColumn.tsx            # 時間軸コンポーネント
-│   ├── familyMemberColumn/       # 家族メンバー関連
-│   │   ├── index.tsx            # 家族メンバーメインコンポーネント
-│   │   └── EventDisplay.tsx     # イベント表示子コンポーネント
-│   ├── TodayButton.tsx           # 今日ボタンコンポーネント
-│   ├── LoadingIndicator.tsx      # ローディング表示コンポーネント
-│   ├── settingsModal/           # 設定モーダル関連
-│   │   ├── index.tsx            # 設定モーダルメインコンポーネント
-│   │   └── TimeRangeInput.tsx   # 時間範囲入力子コンポーネント
-│   └── useTouchNavigation.ts     # タッチナビゲーションhooks
-├── family/
-│   ├── FamilyMember.tsx          # 家族メンバーコンポーネント
-│   ├── useFamilySettings.ts      # 家族設定のhooks
-│   └── FamilyTypes.ts            # 家族関連の型定義
-└── shared/
-    ├── contexts/                 # 共通のContext
-    ├── hooks/                    # 共通のhooks
-    └── types/                    # 共通の型定義
+src/Calendar/                     # Calendarコンポーネント
+├── index.tsx                     # export const Calendar = ... (18行)
+├── components/                   # 子コンポーネント群
+│   ├── CalendarGrid/            # CalendarGridコンポーネント
+│   │   ├── index.tsx            # export const CalendarGrid = ...
+│   │   └── useCellLayout.ts     # コンポーネント専用hooks
+│   ├── TouchNavigationWrapper/  # TouchNavigationWrapperコンポーネント
+│   │   ├── index.tsx            # export const TouchNavigationWrapper = ...
+│   │   ├── useSwipeState.ts     # コンポーネント専用hooks
+│   │   └── useTouchNavigation.ts # コンポーネント専用hooks
+│   ├── CalendarHeader.tsx       # 単一ファイルコンポーネント
+│   ├── TodayButton.tsx          # 単一ファイルコンポーネント
+│   ├── SettingsModal.tsx        # 単一ファイルコンポーネント
+│   └── AuthStatus.tsx           # 単一ファイルコンポーネント
+├── auth/                        # 認証関連
+│   ├── useAuth.ts
+│   ├── IAuthClient.ts
+│   ├── MockAuthClient.ts
+│   └── __tests__/
+│       └── useAuth.test.tsx
+├── data/                        # データ取得関連
+│   ├── queries/
+│   │   ├── useCalendarEvents.ts
+│   │   └── useCalendarList.ts
+│   ├── useCalendarEvents.ts
+│   ├── useCalendarList.ts
+│   └── useFamilyCalendars.ts
+├── display/                     # UI表示関連
+│   ├── TimeColumn.tsx
+│   ├── EventsLoadingPlaceholder.tsx
+│   ├── FamilyMemberColumn/      # FamilyMemberColumnコンポーネント
+│   │   ├── index.tsx            # export const FamilyMemberColumn = ...
+│   │   └── EventDisplay.tsx
+│   └── utils/
+│       └── cellBackgroundUtils.ts
+├── settings/                    # 設定関連
+│   └── SettingsModal/           # SettingsModalコンポーネント
+│       ├── index.tsx            # export const SettingsModal = ...
+│       ├── TimeRangeInput.tsx
+│       ├── CalendarSelector.tsx
+│       ├── CalendarSettingsTab.tsx
+│       └── MultipleCalendarSelector.tsx
+└── shared/                      # 共通要素
+    ├── types.ts                 # 共通型定義
+    ├── utils.ts
+    ├── mockData.ts
+    ├── useGoogleCalendar.ts     # 統合hooks
+    ├── useDateNavigation.ts
+    └── useSettings.ts
 ```
+
+#### コンポーネント専用hooksの配置指針
+
+hooksの配置は以下の基準で決定します：
+
+**配置基準**:
+- **単一コンポーネント専用**: `ComponentName/useSpecificHook.ts`
+- **関連領域内共通**: `relatedArea/useSharedHook.ts`
+- **全体共通**: `shared/useGlobalHook.ts`
+
+**実装例**:
+```typescript
+// ❌ バケツリレーパターン（避けるべき）
+export const ParentComponent = () => {
+  const { data, loading } = useCustomHook();
+  return <ChildComponent data={data} loading={loading} />;
+};
+
+// ✅ 直接参照パターン（推奨）
+export const ChildComponent = () => {
+  const { data, loading } = useCustomHook();
+  return <div>{data}</div>;
+};
+```
+
+**判断基準**:
+- propsとして渡しているデータが、親コンポーネントで直接使用されていない
+- 子コンポーネントが特定のhookに強く依存している
+- インポートチェーンが深くなっている
+
+#### 大規模リファクタリングについて
+
+肥大化したコンポーネントやhooksの分割、適切なフォルダ構造への移行などの大規模リファクタリングを行う際は、[REFACTORING_GUIDE.md](./REFACTORING_GUIDE.md)を参照してください。このガイドには具体的な手順、アンチパターンの検出方法、段階的な実行プロセスが記載されています。
 
 **避けるべき構造**:
 ```
 src/
-├── components/           # 機能別ではなく技術別の分類
+├── components/           # 技術的分類（コンポーネント単位の整理なし）
 │   ├── CalendarGrid.tsx
 │   └── FamilyMember.tsx
-├── hooks/               # 機能別ではなく技術別の分類
+├── hooks/               # 技術的分類（コンポーネント単位の整理なし）
 │   ├── useCalendarData.ts
 │   └── useFamilySettings.ts
-└── types/               # 機能別ではなく技術別の分類
+└── types/               # 技術的分類（コンポーネント単位の整理なし）
     ├── CalendarTypes.ts
     └── FamilyTypes.ts
 ```
@@ -264,6 +343,44 @@ modalState: { isSettingsOpen, ... }           // ❌ どのモーダルか不明
 4. **冗長な接尾語を避ける**: `State`、`Data`などの汎用的な接尾語は除く
 5. **データ重複を避ける**: 同じデータが複数のオブジェクトに含まれないよう設計
 
+### ファイル・ディレクトリ命名規則
+
+#### ファイル命名規則
+- **コンポーネント**: PascalCase (`CalendarGrid.tsx`)
+- **hooks**: camelCase with use prefix (`useCalendarData.ts`)
+- **型定義**: PascalCase (`CalendarEvent`)
+- **その他**: camelCase (`utils.ts`, `mockData.ts`)
+
+#### ディレクトリ命名規則
+
+**基本概念**: フォルダはコンポーネントフォルダ（PascalCase）かその他フォルダ（camelCase）のいずれかです。
+
+##### コンポーネントフォルダ (PascalCase)
+- 直下の`index.tsx`でコンポーネントをexport
+- 例: `Calendar/`, `CalendarGrid/`, `FamilyMemberColumn/`
+
+##### その他フォルダ (camelCase)  
+- 関連ファイルの整理・分類
+- 例: `Calendar/auth/`, `Calendar/settings/`, `Calendar/components/`
+
+**実例**:
+```
+src/
+├── Calendar/              # コンポーネントフォルダ (Calendarコンポーネント)
+│   ├── index.tsx         # export const Calendar = ...
+│   ├── auth/             # その他フォルダ (認証関連)
+│   ├── settings/         # その他フォルダ (設定関連) 
+│   ├── components/       # その他フォルダ (子コンポーネント群)
+│   │   ├── CalendarGrid/ # コンポーネントフォルダ (CalendarGridコンポーネント)
+│   │   │   └── index.tsx # export const CalendarGrid = ...
+│   │   ├── FamilyMemberColumn/ # コンポーネントフォルダ (FamilyMemberColumnコンポーネント)
+│   │   │   └── index.tsx # export const FamilyMemberColumn = ...
+│   │   └── ...
+│   ├── shared/          # その他フォルダ (共通要素)
+│   └── display/         # その他フォルダ (UI表示関連)
+└── api/                 # その他フォルダ
+```
+
 ### エラーハンドリング
 
 **明確なエラー型定義**:
@@ -285,43 +402,45 @@ export const useCalendarData = (): {
 
 ### テスト可能性の向上
 
-**関数注入による依存関係の分離**: テストが困難な関数（fetchやDate操作など）は引数で受け取り、テスト時にモック関数を注入できるようにする。
+**依存関係注入による分離**: テストが困難な外部依存（API呼び出し、ブラウザAPI等）はインターフェースで抽象化し、テスト時にモック実装を注入できるようにする。
 
 ```typescript
-// ✅ 良い例 - 関数注入パターン
-interface CalendarDataFetcher {
-  fetchEvents: (calendarId: string, dateRange: DateRange) => Promise<CalendarEvent[]>;
-  getCurrentDate: () => Date;
+// ✅ 良い例 - 依存関係注入パターン
+interface IAuthClient {
+  login(): Promise<void>;
+  logout(): Promise<void>;
+  checkAuthStatus(): Promise<boolean>;
 }
 
-export const useCalendarData = (
-  fetcher: CalendarDataFetcher = {
-    fetchEvents: defaultFetchEvents,
-    getCurrentDate: () => new Date()
-  }
-) => {
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
+export const useAuth = (options: { authClient?: IAuthClient } = {}) => {
+  const authClient = options.authClient || new AuthClient();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
-  const loadEvents = async (calendarId: string) => {
-    const dateRange = { start: fetcher.getCurrentDate(), /* ... */ };
-    const data = await fetcher.fetchEvents(calendarId, dateRange);
-    setEvents(data);
+  const checkAuthStatus = async () => {
+    const authenticated = await authClient.checkAuthStatus();
+    setIsAuthenticated(authenticated);
   };
   
-  return { events, loadEvents };
+  return { isAuthenticated, checkAuthStatus };
 };
 
 // テスト例
-test('カレンダーデータを正しく取得する', async () => {
-  const mockFetcher: CalendarDataFetcher = {
-    fetchEvents: jest.fn().mockResolvedValue([/* mock data */]),
-    getCurrentDate: jest.fn().mockReturnValue(new Date('2024-01-01'))
+test('認証状態を正しく取得する', async () => {
+  const mockAuthClient: IAuthClient = {
+    login: vi.fn(),
+    logout: vi.fn(),
+    checkAuthStatus: vi.fn().mockResolvedValue(true)
   };
   
-  const { result } = renderHook(() => useCalendarData(mockFetcher));
+  const { result } = renderHook(() => useAuth({ authClient: mockAuthClient }));
   // テスト実行...
 });
 ```
+
+**実装済みテスタビリティ改善**:
+- `useAuth`: AuthClientをインターフェース化し、MockAuthClientでテスト可能
+- `useGoogleCalendar`: 認証依存関係を注入可能に設計
+- テスト用モック: `MockAuthClient`でエラーケースや状態変化をテスト可能
 
 **避けるべきパターン**:
 ```typescript

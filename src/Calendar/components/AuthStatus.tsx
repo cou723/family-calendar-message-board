@@ -1,27 +1,32 @@
-interface AuthStatusProps {
-	isAuthenticated: boolean;
-	isAuthenticating: boolean;
-	authError: string | null;
-	useMockData: boolean;
-	onAuthenticate: () => void;
-	onLogout?: () => void;
-}
+import { useEffect } from "react";
+import { useDateNavigation } from "../shared/useDateNavigation";
+import { useGoogleCalendar } from "../shared/useGoogleCalendar";
 
-export const AuthStatus = ({
-	isAuthenticated,
-	isAuthenticating,
-	authError,
-	useMockData,
-	onAuthenticate,
-	onLogout,
-}: AuthStatusProps) => {
+export const AuthStatus = () => {
+	const { currentDate } = useDateNavigation();
+	const {
+		isAuthenticated,
+		isAuthenticating,
+		authError,
+		useMockData,
+		authenticate,
+		logout,
+	} = useGoogleCalendar(currentDate.date);
+
+	// アプリ起動時に認証チェック
+	useEffect(() => {
+		if (!isAuthenticated) {
+			authenticate();
+		}
+	}, [isAuthenticated, authenticate]);
+
 	// 認証済みの場合はログアウトボタンのみ表示
 	if (isAuthenticated && !authError && !useMockData) {
-		return onLogout ? (
+		return logout ? (
 			<div className="fixed top-4 left-4 z-40">
 				<button
 					type="button"
-					onClick={onLogout}
+					onClick={logout}
 					className="bg-red-500 text-white px-3 py-1 rounded text-sm font-medium hover:bg-red-600 transition-colors"
 				>
 					ログアウト
@@ -58,7 +63,7 @@ export const AuthStatus = ({
 							{!isAuthenticated && !useMockData && (
 								<button
 									type="button"
-									onClick={onAuthenticate}
+									onClick={authenticate}
 									className="w-full bg-blue-500 text-white px-4 py-2 rounded text-base font-semibold hover:bg-blue-600 transition-colors"
 								>
 									Googleカレンダーに接続
@@ -68,7 +73,7 @@ export const AuthStatus = ({
 							{useMockData && (
 								<button
 									type="button"
-									onClick={onAuthenticate}
+									onClick={authenticate}
 									className="w-full bg-green-500 text-white px-4 py-2 rounded text-base font-semibold hover:bg-green-600 transition-colors"
 								>
 									Google認証を再試行

@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import type { CalendarEvent, CellLayout, FamilyMember } from "../types";
+import type {
+	CalendarEvent,
+	CellLayout,
+	FamilyMember,
+} from "../../shared/types";
 import { getCellBackgroundClass } from "../utils/cellBackgroundUtils";
 import { EventDisplay } from "./EventDisplay";
 

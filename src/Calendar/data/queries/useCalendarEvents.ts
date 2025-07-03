@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { fetchCalendarEvents } from "../../api/calendar";
-import { mockEvents } from "../mockData";
-import type { CalendarEvent, FamilyCalendarConfig } from "../types";
+import { fetchCalendarEvents } from "../../../api/calendar";
+import { mockEvents } from "../../shared/mockData";
+import type { CalendarEvent, FamilyCalendarConfig } from "../../shared/types";
 
 interface UseCalendarEventsParams {
 	date: Date;

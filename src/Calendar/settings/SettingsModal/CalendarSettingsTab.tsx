@@ -1,4 +1,4 @@
-import type { FamilyCalendarConfig } from "../types";
+import type { FamilyCalendarConfig } from "../../shared/types";
 import { MultipleCalendarSelector } from "./MultipleCalendarSelector";
 
 interface CalendarSettingsTabProps {
