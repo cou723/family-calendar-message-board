@@ -1,9 +1,8 @@
-import { isAuthenticated } from "./gapiAuth";
 import { useCalendarListQuery } from "./queries/useCalendarList";
 
-export const useCalendarList = () => {
-	const enabled = isAuthenticated();
-	
+export const useCalendarList = (isAuthenticated: boolean = false) => {
+	const enabled = isAuthenticated;
+
 	const {
 		data: calendars = [],
 		isLoading,

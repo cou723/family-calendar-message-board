@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getGapiCalendarClient } from "../gapiAuth";
+import { fetchCalendarList } from "../../api/calendar";
 import type { GoogleCalendarInfo } from "../types";
 
 export const useCalendarListQuery = (enabled: boolean) => {
@@ -8,13 +8,7 @@ export const useCalendarListQuery = (enabled: boolean) => {
 	const query = useQuery({
 		queryKey: ["calendarList"],
 		queryFn: async (): Promise<GoogleCalendarInfo[]> => {
-			const calendar = getGapiCalendarClient();
-
-			const response = await calendar.calendarList.list({
-				showHidden: false,
-			});
-
-			const calendarList = response.result.items || [];
+			const calendarList = await fetchCalendarList();
 
 			// プライマリカレンダーを最初に配置し、残りは名前順でソート
 			return calendarList

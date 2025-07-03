@@ -1,0 +1,42 @@
+name: Deploy to Deno Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'deno-backend/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Verify Deno installation
+        run: deno --version
+
+      - name: Deploy to Deno Deploy
+        uses: denoland/deployctl@v1
+        with:
+          project: family-calendar-api
+          entrypoint: deno-backend/main.ts
+          root: .
+          env: |
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            BASE_URL=${{ secrets.BASE_URL }}
+            DENO_ENV=production

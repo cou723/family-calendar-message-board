@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { CalendarEvent, CellLayout, FamilyMember } from "../types";
-import { EventDisplay } from "./EventDisplay";
 import { getCellBackgroundClass } from "../utils/cellBackgroundUtils";
+import { EventDisplay } from "./EventDisplay";
 
 interface FamilyMemberColumnProps {
 	familyMember: FamilyMember;
@@ -44,13 +44,13 @@ export const FamilyMemberColumn = ({
 			{Array.from(
 				{ length: endHour - startHour + 1 },
 				(_, i) => i + startHour,
-			).map((hour) =>
+			).map((hour) => (
 				<div
 					key={`bg-${member}-${hour}`}
 					className={`border-b border-blue-200 ${getCellBackgroundClass({ hour, isCurrentHour: hour === currentHour })}`}
 					style={{ height: `${cellHeight}px` }}
 				/>
-			)}
+			))}
 
 			{/* イベント表示（絶対位置） */}
 			<EventDisplay

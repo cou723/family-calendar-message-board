@@ -43,7 +43,9 @@ export const AuthStatus = ({
 						<>
 							{authError && (
 								<div className="mb-3">
-									<div className="text-sm text-orange-600 mb-2">{authError}</div>
+									<div className="text-sm text-orange-600 mb-2">
+										{authError}
+									</div>
 									{useMockData && (
 										<div className="text-sm text-blue-600">
 											現在はサンプルデータを表示しています

@@ -1,17 +1,14 @@
-import { useState } from "react";
-import {
-	authenticateGoogle,
-	initializeGapi,
-	isAuthenticated,
-	logout,
-} from "./gapiAuth";
+import { useEffect, useState } from "react";
+import { AuthClient } from "../api/auth";
 import { useCalendarEvents } from "./queries/useCalendarEvents";
 import type { FamilyCalendarConfig } from "./types";
+
+const authClient = new AuthClient();
 
 export const useGoogleCalendar = (currentDate: Date) => {
 	const [isAuthenticating, setIsAuthenticating] = useState(false);
 	const [authError, setAuthError] = useState<string | null>(null);
-	const [isGapiInitialized, setIsGapiInitialized] = useState(false);
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [useMockData, setUseMockData] = useState(false);
 
 	// 家族メンバーのカレンダー設定（ローカルストレージから読み込み）
@@ -66,6 +63,27 @@ export const useGoogleCalendar = (currentDate: Date) => {
 		];
 	});
 
+	// 認証状態の初期チェック
+	useEffect(() => {
+		checkAuthStatus();
+	}, []);
+
+	const checkAuthStatus = async () => {
+		try {
+			const authenticated = await authClient.checkAuthStatus();
+			setIsAuthenticated(authenticated);
+			if (!authenticated) {
+				setUseMockData(true);
+				setAuthError("認証が必要です。モックデータを使用します。");
+			}
+		} catch (error) {
+			console.error("認証状態確認エラー:", error);
+			setIsAuthenticated(false);
+			setUseMockData(true);
+			setAuthError("認証状態の確認に失敗しました。モックデータを使用します。");
+		}
+	};
+
 	// TanStack Queryを使ってイベントを取得
 	const {
 		data: events = [],
@@ -76,62 +94,25 @@ export const useGoogleCalendar = (currentDate: Date) => {
 		date: currentDate,
 		familyCalendars,
 		useMockData,
-		enabled: isGapiInitialized && (useMockData || isAuthenticated()),
+		enabled: useMockData || isAuthenticated,
 	});
-
-	/**
-	 * Google API初期化
-	 */
-	const initializeApi = async (): Promise<boolean> => {
-		try {
-			const success = await initializeGapi();
-			setIsGapiInitialized(success);
-			if (!success) {
-				setAuthError(
-					"Google APIの初期化に失敗しました。モックデータを使用します。",
-				);
-				setUseMockData(true);
-			}
-			return success;
-		} catch (error) {
-			console.error("Google API初期化エラー:", error);
-			setAuthError(
-				"Google APIの初期化に失敗しました。モックデータを使用します。",
-			);
-			setUseMockData(true);
-			setIsGapiInitialized(false);
-			return false;
-		}
-	};
 
 	/**
 	 * Google認証を実行
 	 */
 	const authenticate = async (): Promise<boolean> => {
-		if (!isGapiInitialized) {
-			await initializeApi();
-		}
-
-		if (useMockData) {
-			return true; // モックデータ使用時は認証成功とみなす
-		}
-
 		setIsAuthenticating(true);
 		setAuthError(null);
 
 		try {
-			const success = await authenticateGoogle();
-			if (!success) {
-				setAuthError("Google認証に失敗しました。モックデータを使用します。");
-				setUseMockData(true);
-			}
-			return true; // 認証失敗時もモックデータで継続
+			await authClient.login();
+			return true;
 		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : "Unknown error";
 			setAuthError(`認証エラー: ${errorMessage}。モックデータを使用します。`);
 			setUseMockData(true);
-			return true;
+			return false;
 		} finally {
 			setIsAuthenticating(false);
 		}
@@ -147,11 +128,15 @@ export const useGoogleCalendar = (currentDate: Date) => {
 	/**
 	 * ログアウト処理
 	 */
-	const handleLogout = () => {
-		logout();
-		setUseMockData(true);
-		setAuthError(null);
-		setIsGapiInitialized(false);
+	const handleLogout = async () => {
+		try {
+			await authClient.logout();
+			setIsAuthenticated(false);
+			setUseMockData(true);
+			setAuthError("ログアウトしました。モックデータを使用します。");
+		} catch (error) {
+			console.error("ログアウトエラー:", error);
+		}
 	};
 
 	/**
@@ -173,7 +158,7 @@ export const useGoogleCalendar = (currentDate: Date) => {
 
 	return {
 		// 認証関連
-		isAuthenticated: useMockData || isAuthenticated(),
+		isAuthenticated: useMockData || isAuthenticated,
 		isAuthenticating,
 		authError,
 		authenticate,
@@ -189,6 +174,6 @@ export const useGoogleCalendar = (currentDate: Date) => {
 		familyCalendars,
 		updateFamilyCalendars,
 		useMockData,
-		isGapiInitialized,
+		isGapiInitialized: true, // 新システムでは常にtrue
 	};
 };

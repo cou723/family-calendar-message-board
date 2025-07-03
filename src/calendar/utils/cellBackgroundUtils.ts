@@ -10,15 +10,15 @@ interface CellBackgroundOptions {
 /**
  * 時間セルの背景色クラスを取得
  */
-export const getCellBackgroundClass = ({ hour, isCurrentHour }: CellBackgroundOptions): string => {
-	if (isCurrentHour)
-		return "bg-yellow-100";
+export const getCellBackgroundClass = ({
+	hour,
+	isCurrentHour,
+}: CellBackgroundOptions): string => {
+	if (isCurrentHour) return "bg-yellow-100";
 
-	if (hour % 3 === 0)
-		return "bg-gray-200";
+	if (hour % 3 === 0) return "bg-gray-200";
 
-	if (hour % 2 === 0)
-		return "bg-gray-100";
+	if (hour % 2 === 0) return "bg-gray-100";
 
 	return "";
 };
@@ -26,7 +26,10 @@ export const getCellBackgroundClass = ({ hour, isCurrentHour }: CellBackgroundOp
 /**
  * 時間列の背景色クラスを取得（時間表示用）
  */
-export const getTimeColumnBackgroundClass = ({ hour, isCurrentHour }: CellBackgroundOptions): string => {
+export const getTimeColumnBackgroundClass = ({
+	hour,
+	isCurrentHour,
+}: CellBackgroundOptions): string => {
 	if (isCurrentHour) {
 		return "bg-yellow-200 text-yellow-900 font-bold";
 	}

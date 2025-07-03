@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { CellLayout } from "./types";
 import { getTimeColumnBackgroundClass } from "./utils/cellBackgroundUtils";
 
@@ -31,7 +31,10 @@ export const TimeColumn = ({ cellLayout }: TimeColumnProps) => {
 				(_, i) => i + startHour,
 			).map((hour) => {
 				const isCurrentHour = hour === currentHour;
-				const backgroundClass = getTimeColumnBackgroundClass({ hour, isCurrentHour });
+				const backgroundClass = getTimeColumnBackgroundClass({
+					hour,
+					isCurrentHour,
+				});
 				return (
 					<div
 						key={`time-${hour}`}

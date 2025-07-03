@@ -102,7 +102,6 @@ export const Calendar = () => {
 				</div>
 			</div>
 
-
 			{/* フローティングボタン */}
 			<TodayButton goToToday={actions.goToToday} />
 

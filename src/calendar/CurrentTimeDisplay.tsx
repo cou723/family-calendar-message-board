@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
+import { useEffect, useState } from "react";
 
 export const CurrentTimeDisplay = () => {
 	const [currentTime, setCurrentTime] = useState(new Date());

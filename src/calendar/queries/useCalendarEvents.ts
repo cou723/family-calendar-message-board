@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { fetchGapiMultipleCalendarEvents } from "../gapiCalendarApi";
+import { fetchCalendarEvents } from "../../api/calendar";
 import { mockEvents } from "../mockData";
 import type { CalendarEvent, FamilyCalendarConfig } from "../types";
-import { isAuthenticated } from "../gapiAuth";
 
 interface UseCalendarEventsParams {
 	date: Date;
@@ -23,7 +22,7 @@ export const useCalendarEvents = ({
 	return useQuery({
 		queryKey: ["calendarEvents", dateKey, familyCalendars, useMockData],
 		queryFn: async (): Promise<CalendarEvent[]> => {
-			if (useMockData || !isAuthenticated()) {
+			if (useMockData) {
 				// モックデータを使用（CalendarEvent型に変換）
 				console.log("モックデータを使用します");
 				const calendarEvents: CalendarEvent[] = mockEvents.map((event) => ({
@@ -35,18 +34,39 @@ export const useCalendarEvents = ({
 				return calendarEvents;
 			}
 
-			// 各家族メンバーの複数カレンダーを展開
-			const calendarConfigs: { calendarId: string; member: string }[] = [];
-			familyCalendars.forEach((familyConfig) => {
-				familyConfig.calendarIds.forEach((calendarId) => {
-					calendarConfigs.push({
-						calendarId,
-						member: familyConfig.member,
-					});
-				});
-			});
+			// 各家族メンバーの複数カレンダーからイベントを取得
+			const allEvents: CalendarEvent[] = [];
+			const timeMin = format(date, "yyyy-MM-dd'T'00:00:00.000'Z'");
+			const timeMax = format(date, "yyyy-MM-dd'T'23:59:59.999'Z'");
 
-			return await fetchGapiMultipleCalendarEvents(calendarConfigs, date);
+			for (const familyConfig of familyCalendars) {
+				for (const calendarId of familyConfig.calendarIds) {
+					try {
+						const events = await fetchCalendarEvents(calendarId, {
+							timeMin,
+							timeMax,
+						});
+
+						// メンバー情報を追加
+						const eventsWithMember = events.map((event) => ({
+							...event,
+							member: familyConfig.member,
+						}));
+
+						allEvents.push(...eventsWithMember);
+					} catch (error) {
+						if (error instanceof Error && error.message === "UNAUTHORIZED") {
+							throw error; // 認証エラーは上位に伝播
+						}
+						console.error(
+							`カレンダー ${calendarId} のイベント取得エラー:`,
+							error,
+						);
+					}
+				}
+			}
+
+			return allEvents;
 		},
 		enabled,
 		staleTime: 5 * 60 * 1000, // 5分間はフレッシュ
