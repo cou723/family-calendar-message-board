@@ -21,7 +21,7 @@ export const useCalendarListQuery = (enabled: boolean) => {
 						accessRole: (cal.accessRole as string) || "reader",
 						backgroundColor: cal.backgroundColor as string,
 					};
-				}))
+				})
 				.sort((a: GoogleCalendarInfo, b: GoogleCalendarInfo) => {
 					if (a.primary) return -1;
 					if (b.primary) return 1;

@@ -12,7 +12,8 @@
 		"preview": "vite preview",
 		"test": "vitest",
 		"test:ui": "vitest --ui",
-		"test:run": "vitest run"
+		"test:run": "vitest run",
+		"prepare": "husky"
 	},
 	"dependencies": {
 		"@tanstack/react-query": "^5.81.5",
@@ -36,10 +37,21 @@
 		"@types/react-dom": "^19.1.6",
 		"@vitejs/plugin-react": "^4.5.2",
 		"@vitest/ui": "^3.2.4",
+		"husky": "^9.1.7",
 		"jsdom": "^26.1.0",
+		"lint-staged": "^16.1.2",
 		"tailwindcss": "^4.1.11",
 		"typescript": "~5.8.3",
 		"vite": "^7.0.0",
 		"vitest": "^3.2.4"
+	},
+	"lint-staged": {
+		"*.{ts,tsx,js,jsx}": [
+			"pnpm run typecheck",
+			"pnpm run lint:fix"
+		],
+		"*.{json,md}": [
+			"pnpm run lint:fix"
+		]
 	}
 }

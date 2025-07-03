@@ -1,0 +1,14 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Checking types, linting, and formatting..."
+
+# 型チェック
+echo "📝 Running typecheck..."
+pnpm run typecheck
+
+# Lint & Format
+echo "🧹 Running lint-staged..."
+npx lint-staged
+
+echo "✅ All checks passed!"
