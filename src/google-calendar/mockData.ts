@@ -1,5 +1,5 @@
-import type { CalendarDataFetcher, ProcessedEvent, DateRange } from "./types";
 import { FAMILY_MEMBERS } from "./config";
+import type { CalendarDataFetcher, DateRange, ProcessedEvent } from "./types";
 
 // モック用の予定データ
 const createMockEvent = (
@@ -11,11 +11,25 @@ const createMockEvent = (
 	isAllDay = false,
 ): ProcessedEvent => {
 	const today = new Date();
-	const startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), startHour, 0, 0);
-	const endTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), endHour, 0, 0);
-	
-	const member = FAMILY_MEMBERS.find(m => m.id === memberId);
-	
+	const startTime = new Date(
+		today.getFullYear(),
+		today.getMonth(),
+		today.getDate(),
+		startHour,
+		0,
+		0,
+	);
+	const endTime = new Date(
+		today.getFullYear(),
+		today.getMonth(),
+		today.getDate(),
+		endHour,
+		0,
+		0,
+	);
+
+	const member = FAMILY_MEMBERS.find((m) => m.id === memberId);
+
 	return {
 		id,
 		title,
@@ -64,7 +78,7 @@ const mockEventsData: ProcessedEvent[] = [
 
 // 日付ごとのイベント生成（前後の日付用）
 const generateEventsForDate = (targetDate: Date): ProcessedEvent[] => {
-	return mockEventsData.map(event => ({
+	return mockEventsData.map((event) => ({
 		...event,
 		id: `${event.id}_${targetDate.getTime()}`,
 		startTime: new Date(
@@ -88,25 +102,25 @@ const generateEventsForDate = (targetDate: Date): ProcessedEvent[] => {
 export const createMockDataFetcher = (): CalendarDataFetcher => ({
 	fetchEvents: async (calendarId: string, dateRange: DateRange) => {
 		// 実際のAPIを模擬した遅延
-		await new Promise(resolve => setTimeout(resolve, 500));
-		
+		await new Promise((resolve) => setTimeout(resolve, 500));
+
 		const targetDate = dateRange.start;
 		const allEvents = generateEventsForDate(targetDate);
-		
+
 		// calendarIdに基づいてメンバーのイベントをフィルタ
-		const member = FAMILY_MEMBERS.find(m => m.calendarId === calendarId);
+		const member = FAMILY_MEMBERS.find((m) => m.calendarId === calendarId);
 		if (!member) return [];
-		
+
 		return allEvents
-			.filter(event => event.memberId === member.id)
-			.map(event => ({
+			.filter((event) => event.memberId === member.id)
+			.map((event) => ({
 				id: event.id,
 				summary: event.title,
-				start: event.isAllDay 
-					? { date: targetDate.toISOString().split('T')[0] }
+				start: event.isAllDay
+					? { date: targetDate.toISOString().split("T")[0] }
 					: { dateTime: event.startTime.toISOString() },
 				end: event.isAllDay
-					? { date: targetDate.toISOString().split('T')[0] }
+					? { date: targetDate.toISOString().split("T")[0] }
 					: { dateTime: event.endTime.toISOString() },
 			})) as any; // Google API形式に合わせる
 	},

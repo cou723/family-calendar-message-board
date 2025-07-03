@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
+import { GoogleCalendarApi } from "./api";
+import { FAMILY_MEMBERS, GOOGLE_CALENDAR_CONFIG } from "./config";
 import type {
-	CalendarError,
 	CalendarDataFetcher,
+	CalendarError,
 	DateRange,
 	ProcessedEvent,
 } from "./types";
-import { GoogleCalendarApi } from "./api";
-import { GOOGLE_CALENDAR_CONFIG, FAMILY_MEMBERS } from "./config";
 
 // デフォルトのデータフェッチャー
 const createDefaultFetcher = (api: GoogleCalendarApi): CalendarDataFetcher => ({
@@ -27,7 +27,7 @@ export const useGoogleCalendarInit = () => {
 	const initialize = useCallback(async () => {
 		setIsLoading(true);
 		setError(null);
-		
+
 		try {
 			await api.initialize(GOOGLE_CALENDAR_CONFIG);
 			setIsInitialized(true);
@@ -42,7 +42,7 @@ export const useGoogleCalendarInit = () => {
 	const signIn = useCallback(async () => {
 		setIsLoading(true);
 		setError(null);
-		
+
 		try {
 			await api.signIn();
 			setIsSignedIn(true);
@@ -88,8 +88,16 @@ export const useFamilyCalendarData = (
 
 		try {
 			const dateRange: DateRange = {
-				start: new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate()),
-				end: new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() + 1),
+				start: new Date(
+					targetDate.getFullYear(),
+					targetDate.getMonth(),
+					targetDate.getDate(),
+				),
+				end: new Date(
+					targetDate.getFullYear(),
+					targetDate.getMonth(),
+					targetDate.getDate() + 1,
+				),
 			};
 
 			const allEvents: ProcessedEvent[] = [];
@@ -97,9 +105,12 @@ export const useFamilyCalendarData = (
 			// 各家族メンバーのイベントを並列取得
 			const eventPromises = FAMILY_MEMBERS.map(async (member) => {
 				try {
-					const memberEvents = await actualFetcher.fetchEvents(member.calendarId, dateRange);
+					const memberEvents = await actualFetcher.fetchEvents(
+						member.calendarId,
+						dateRange,
+					);
 					return memberEvents.map((event) =>
-						api.processEvent(event, member.id, member.color)
+						api.processEvent(event, member.id, member.color),
 					);
 				} catch (memberError) {
 					console.warn(`${member.name}のカレンダー取得に失敗:`, memberError);

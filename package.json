@@ -17,6 +17,7 @@
 	"dependencies": {
 		"date-fns": "^4.1.0",
 		"gapi-script": "^1.2.0",
+		"googleapis": "^150.0.1",
 		"react": "^19.1.0",
 		"react-aria-components": "^1.10.1",
 		"react-dom": "^19.1.0"

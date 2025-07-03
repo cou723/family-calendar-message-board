@@ -1,12 +1,12 @@
 import { useState } from "react";
 
 export const useSwipeState = () => {
-  const [startX, setStartX] = useState<number | null>(null);
+	const [startX, setStartX] = useState<number | null>(null);
 
-  return {
-    swipe: {
-      startX,
-      setStartX,
-    },
-  };
+	return {
+		swipe: {
+			startX,
+			setStartX,
+		},
+	};
 };

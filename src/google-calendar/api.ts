@@ -33,7 +33,10 @@ export class GoogleCalendarApi {
 			this.isInitialized = true;
 			this.isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
 		} catch (error) {
-			throw this.createError("INITIALIZATION_ERROR", `初期化に失敗しました: ${error}`);
+			throw this.createError(
+				"INITIALIZATION_ERROR",
+				`初期化に失敗しました: ${error}`,
+			);
 		}
 	}
 
@@ -42,7 +45,10 @@ export class GoogleCalendarApi {
 	 */
 	async signIn(): Promise<void> {
 		if (!this.isInitialized) {
-			throw this.createError("INITIALIZATION_ERROR", "APIが初期化されていません");
+			throw this.createError(
+				"INITIALIZATION_ERROR",
+				"APIが初期化されていません",
+			);
 		}
 
 		try {
@@ -91,18 +97,25 @@ export class GoogleCalendarApi {
 					gapiError.status,
 				);
 			}
-			throw this.createError("NETWORK_ERROR", "ネットワークエラーが発生しました");
+			throw this.createError(
+				"NETWORK_ERROR",
+				"ネットワークエラーが発生しました",
+			);
 		}
 	}
 
 	/**
 	 * イベントをアプリケーション用に変換
 	 */
-	processEvent(event: CalendarEvent, memberId: string, color: string): ProcessedEvent {
+	processEvent(
+		event: CalendarEvent,
+		memberId: string,
+		color: string,
+	): ProcessedEvent {
 		const startTime = event.start?.dateTime
 			? new Date(event.start.dateTime)
 			: new Date(event.start?.date || "");
-		
+
 		const endTime = event.end?.dateTime
 			? new Date(event.end.dateTime)
 			: new Date(event.end?.date || "");
@@ -132,7 +145,10 @@ export class GoogleCalendarApi {
 			case "GOOGLE_API_ERROR":
 				return { type, message, code: code || 0 };
 			case "PERMISSION_ERROR":
-				return { type, requiredScope: "https://www.googleapis.com/auth/calendar.readonly" };
+				return {
+					type,
+					requiredScope: "https://www.googleapis.com/auth/calendar.readonly",
+				};
 			default:
 				return { type, message };
 		}

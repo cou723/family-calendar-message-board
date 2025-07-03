@@ -6,7 +6,9 @@ import App from "./App";
 describe("App", () => {
 	it("renders Vite + React heading", () => {
 		render(<App />);
-		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Vite + React");
+		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+			"Vite + React",
+		);
 	});
 
 	it("increments count when button is clicked", async () => {

@@ -1,9 +1,7 @@
 export const TestPage = () => {
 	return (
 		<div className="min-h-screen bg-gray-100 p-8">
-			<h1 className="text-4xl font-bold text-center mb-8">
-				🧪 テストページ
-			</h1>
+			<h1 className="text-4xl font-bold text-center mb-8">🧪 テストページ</h1>
 			<div className="grid grid-cols-4 gap-4 max-w-4xl mx-auto">
 				<div className="bg-blue-500 text-white p-4 rounded-lg text-center">
 					<h2 className="text-xl font-bold">お父さん</h2>

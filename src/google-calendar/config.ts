@@ -19,7 +19,7 @@ export const FAMILY_MEMBERS = [
 		color: "#4285f4", // Google Blue
 	},
 	{
-		id: "member2", 
+		id: "member2",
 		name: "お母さん",
 		calendarId: import.meta.env.VITE_CALENDAR_ID_MOTHER || "mother@example.com",
 		color: "#ea4335", // Google Red
