@@ -3,7 +3,6 @@ import { AuthStatus } from "./AuthStatus";
 import { CalendarHeader } from "./CalendarHeader";
 import { EventsLoadingPlaceholder } from "./EventsLoadingPlaceholder";
 import { FamilyMemberColumn } from "./familyMemberColumn";
-import { LoadingIndicator } from "./LoadingIndicator";
 import { SettingsModal } from "./settingsModal";
 import { TimeColumn } from "./TimeColumn";
 import { TodayButton } from "./TodayButton";
@@ -104,11 +103,6 @@ export const Calendar = () => {
 
 			{/* フローティングボタン */}
 			<TodayButton goToToday={actions.goToToday} />
-
-			{/* ローディングインジケーター */}
-			<LoadingIndicator
-				isDateChanging={currentDate.isDateChanging || isLoadingEvents}
-			/>
 
 			{/* 設定モーダル */}
 			<SettingsModal
