@@ -1,4 +1,6 @@
+import { useState, useEffect } from "react";
 import type { CellLayout } from "./types";
+import { getTimeColumnBackgroundClass } from "./utils/cellBackgroundUtils";
 
 interface TimeColumnProps {
 	cellLayout: CellLayout;
@@ -6,6 +8,16 @@ interface TimeColumnProps {
 
 export const TimeColumn = ({ cellLayout }: TimeColumnProps) => {
 	const { startHour, endHour, cellHeight, headerHeight } = cellLayout;
+	const [currentHour, setCurrentHour] = useState<number>(new Date().getHours());
+
+	useEffect(() => {
+		const updateCurrentHour = () => {
+			setCurrentHour(new Date().getHours());
+		};
+
+		const interval = setInterval(updateCurrentHour, 60000);
+		return () => clearInterval(interval);
+	}, []);
 	return (
 		<div className="w-14 bg-blue-50 border-r-2 border-blue-200 flex-shrink-0">
 			<div
@@ -17,15 +29,19 @@ export const TimeColumn = ({ cellLayout }: TimeColumnProps) => {
 			{Array.from(
 				{ length: endHour - startHour + 1 },
 				(_, i) => i + startHour,
-			).map((hour) => (
-				<div
-					key={`time-${hour}`}
-					className="border-b border-blue-200 text-center text-lg text-blue-800 flex items-center justify-center font-medium"
-					style={{ height: `${cellHeight}px` }}
-				>
-					{hour}
-				</div>
-			))}
+			).map((hour) => {
+				const isCurrentHour = hour === currentHour;
+				const backgroundClass = getTimeColumnBackgroundClass({ hour, isCurrentHour });
+				return (
+					<div
+						key={`time-${hour}`}
+						className={`border-b border-blue-200 text-center text-lg flex items-center justify-center font-medium ${backgroundClass}`}
+						style={{ height: `${cellHeight}px` }}
+					>
+						{hour}
+					</div>
+				);
+			})}
 		</div>
 	);
 };
