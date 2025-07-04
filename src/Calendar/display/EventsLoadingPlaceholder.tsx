@@ -20,7 +20,7 @@ export const EventsLoadingPlaceholder = ({
 				>
 					{/* ヘッダー */}
 					<div
-						className={`${familyMember.bgColor} font-bold text-center border-b-2 border-blue-200 text-lg text-gray-800 flex items-center justify-center`}
+						className={`${familyMember.color} font-bold text-center border-b-2 border-blue-200 text-lg text-gray-800 flex items-center justify-center`}
 						style={{ height: `${headerHeight}px` }}
 					>
 						{familyMember.name}

@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useCalendarList } from "../../data/useCalendarList";
+import { useCallback, useEffect, useState } from "react";
 import type { GoogleCalendarInfo } from "../../shared/types";
 
 interface CalendarSelectorProps {
@@ -15,7 +14,32 @@ export const CalendarSelector = ({
 	placeholder = "カレンダーを選択してください",
 	disabled = false,
 }: CalendarSelectorProps) => {
-	const { calendars, isLoading, error, fetchCalendarList } = useCalendarList();
+	const [calendars, setCalendars] = useState<GoogleCalendarInfo[]>([]);
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
+	const fetchCalendarList = useCallback(async () => {
+		setIsLoading(true);
+		setError(null);
+
+		// モックの場合はデフォルトリストを返す
+		const mockCalendars: GoogleCalendarInfo[] = [
+			{
+				id: "primary",
+				summary: "メインカレンダー",
+				primary: true,
+				accessRole: "owner",
+			},
+			{
+				id: "family",
+				summary: "家族カレンダー",
+				primary: false,
+				accessRole: "writer",
+			},
+		];
+		setCalendars(mockCalendars);
+		setIsLoading(false);
+	}, []);
 
 	// コンポーネント初回表示時にカレンダーリストを取得
 	useEffect(() => {
@@ -59,7 +83,7 @@ export const CalendarSelector = ({
 					<option value="" className="text-gray-500">
 						{placeholder}
 					</option>
-					{calendars.map((calendar) => (
+					{calendars.map((calendar: GoogleCalendarInfo) => (
 						<option
 							key={calendar.id}
 							value={calendar.id}

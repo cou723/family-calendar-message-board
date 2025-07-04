@@ -1,9 +1,10 @@
+import { useCalendarEvents } from "../../data/useCalendarEvents";
+import { useFamilyCalendars } from "../../data/useFamilyCalendars";
 import { EventsLoadingPlaceholder } from "../../display/EventsLoadingPlaceholder";
 import { FamilyMemberColumn } from "../../display/FamilyMemberColumn";
 import { TimeColumn } from "../../display/TimeColumn";
 import type { FamilyMember } from "../../shared/types";
 import { useDateNavigation } from "../../shared/useDateNavigation";
-import { useGoogleCalendar } from "../../shared/useGoogleCalendar";
 import { useSettings } from "../../shared/useSettings";
 import { useCellLayout } from "./useCellLayout";
 
@@ -14,9 +15,11 @@ export const CalendarGrid = () => {
 		timeRange.endHour,
 	);
 	const { currentDate } = useDateNavigation();
-	const { events, isLoadingEvents, familyCalendars } = useGoogleCalendar(
-		currentDate.date,
-	);
+	const { familyCalendars } = useFamilyCalendars();
+	const { events, isLoadingEvents } = useCalendarEvents({
+		currentDate: currentDate.date,
+		familyCalendars,
+	});
 
 	const cell = {
 		...timeRange,
@@ -28,7 +31,8 @@ export const CalendarGrid = () => {
 	const familyMembers: FamilyMember[] = familyCalendars.map((calendar) => ({
 		member: calendar.member,
 		name: calendar.name,
-		bgColor: calendar.bgColor,
+		color: calendar.color,
+		calendarId: calendar.calendarIds[0] || "", // 最初のカレンダーIDを使用
 	}));
 
 	return (

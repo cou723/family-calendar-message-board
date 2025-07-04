@@ -10,17 +10,21 @@ export interface CellLayout {
 export interface FamilyMember {
 	member: string;
 	name: string;
-	bgColor: string;
+	color: string;
+	calendarId: string;
 }
 
 // カレンダーイベントの型定義
 export interface CalendarEvent {
 	id: string;
 	title: string;
+	startTime: string;
+	endTime: string;
 	startHour: number;
 	endHour: number;
 	member: string;
 	color: string;
+	calendarId: string;
 	description?: string;
 	location?: string;
 }
@@ -30,7 +34,7 @@ export interface FamilyCalendarConfig {
 	member: string;
 	calendarIds: string[]; // 複数のカレンダーID
 	name: string;
-	bgColor: string;
+	color: string; // bgColorからcolorに統一
 }
 
 // Google Calendarのカレンダー情報

@@ -1,4 +1,3 @@
-import { AuthStatus } from "./components/AuthStatus";
 import { CalendarGrid } from "./components/CalendarGrid";
 import { CalendarHeader } from "./components/CalendarHeader";
 import { SettingsModal } from "./components/SettingsModal";
@@ -12,7 +11,6 @@ export const Calendar = () => {
 			<CalendarGrid />
 			<TodayButton />
 			<SettingsModal />
-			<AuthStatus />
 		</TouchNavigationWrapper>
 	);
 };

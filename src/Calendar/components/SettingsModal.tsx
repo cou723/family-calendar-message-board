@@ -1,14 +1,10 @@
+import { useFamilyCalendars } from "../data/useFamilyCalendars";
 import { SettingsModal as SettingsModalBase } from "../settings/SettingsModal";
-import { useDateNavigation } from "../shared/useDateNavigation";
-import { useGoogleCalendar } from "../shared/useGoogleCalendar";
 import { useSettings } from "../shared/useSettings";
 
 export const SettingsModal = () => {
 	const { timeRange, settingsModal, settingsControl } = useSettings();
-	const { currentDate } = useDateNavigation();
-	const { familyCalendars, updateFamilyCalendars } = useGoogleCalendar(
-		currentDate.date,
-	);
+	const { familyCalendars, updateFamilyCalendars } = useFamilyCalendars();
 
 	return (
 		<SettingsModalBase

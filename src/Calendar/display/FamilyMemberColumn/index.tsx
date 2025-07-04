@@ -19,7 +19,7 @@ export const FamilyMemberColumn = ({
 	events,
 }: FamilyMemberColumnProps) => {
 	const { startHour, endHour, cellHeight, headerHeight } = cellLayout;
-	const { member, name, bgColor } = familyMember;
+	const { member, name, color } = familyMember;
 	const [currentHour, setCurrentHour] = useState<number>(new Date().getHours());
 
 	useEffect(() => {
@@ -38,7 +38,7 @@ export const FamilyMemberColumn = ({
 		>
 			{/* ヘッダー */}
 			<div
-				className={`${bgColor} font-bold text-center border-b-2 border-blue-200 text-lg text-gray-800 flex items-center justify-center`}
+				className={`${color} font-bold text-center border-b-2 border-blue-200 text-lg text-gray-800 flex items-center justify-center`}
 				style={{ height: `${headerHeight}px` }}
 			>
 				{name}
