@@ -4,12 +4,12 @@ import type { CalendarDataProvider } from "./calendarDataProvider";
 /**
  * 認証状態に応じて適切なCalendarDataProviderを取得
  */
-export const getCalendarDataProvider = (): CalendarDataProvider => {
+export const getCalendarDataProvider = (): CalendarDataProvider | null => {
 	// localStorageから直接認証状態を確認（useGoogleAuthと同じ判定基準）
 	const tokenResult = SafeStorage.getItem("google-access-token");
 	const accessToken =
 		tokenResult.success && tokenResult.data ? tokenResult.data : null;
-	const isAuthenticated = !!accessToken && accessToken !== "mock-token";
+	const isAuthenticated = !!accessToken;
 
 	if (!tokenResult.success) {
 		console.warn("アクセストークン取得失敗:", tokenResult.error);
@@ -21,7 +21,7 @@ export const getCalendarDataProvider = (): CalendarDataProvider => {
 		return { type: "google", accessToken };
 	}
 
-	// 未認証またはモックトークンの場合はモックデータを使用
-	console.log("🎭 Using Mock Calendar data provider for mock data");
-	return { type: "mock" };
+	// 未認証の場合はnullを返す（認証が必要）
+	console.log("🔒 Authentication required for Google Calendar access");
+	return null;
 };

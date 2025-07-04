@@ -21,12 +21,6 @@ export const CalendarPage = () => {
 						</button>
 					</div>
 				)}
-				{/* サンプルデータ表示時の表示 */}
-				{user?.access_token === "mock-token" && (
-					<div className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-						サンプルデータ表示中
-					</div>
-				)}
 			</div>
 		</>
 	);

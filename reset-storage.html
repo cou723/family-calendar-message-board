@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>localStorage リセットツール</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .storage-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .key {
+            font-weight: bold;
+            color: #495057;
+        }
+        .value {
+            color: #6c757d;
+            font-size: 0.9em;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        button:hover {
+            background: #c82333;
+        }
+        .reset-all {
+            background: #28a745;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+        .reset-all:hover {
+            background: #218838;
+        }
+        .empty {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+        }
+        .refresh-btn {
+            background: #007bff;
+            margin-bottom: 20px;
+        }
+        .refresh-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗂️ localStorage リセットツール</h1>
+        
+        <div style="background: #e7f3ff; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-left: 4px solid #007bff;">
+            <strong>💡 使用方法：</strong><br>
+            • 🏠 アイコン付きは家族カレンダー関連データ<br>
+            • 初回起動時は空で正常です<br>
+            • 認証後に各種設定が保存されます
+        </div>
+        
+        <button class="refresh-btn" onclick="displayStorageItems()">
+            🔄 最新の状態を表示
+        </button>
+        
+        <div id="storage-list"></div>
+        
+        <button class="reset-all" onclick="resetAllStorage()">
+            🗑️ すべてのlocalStorageをリセット
+        </button>
+    </div>
+
+    <script>
+        // 家族カレンダー関連のlocalStorageキー
+        const FAMILY_CALENDAR_KEYS = [
+            'google-access-token',
+            'google-user-email', 
+            'google-user-name',
+            'family-calendar-settings',
+            'calendar-start-hour',
+            'calendar-end-hour',
+            'selected-calendars'
+        ];
+
+        function displayStorageItems() {
+            const storageList = document.getElementById('storage-list');
+            const items = [];
+            
+            // localStorage内のすべてのアイテムを取得
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                // null や空文字の場合も適切に表示
+                items.push({ key, value: value ?? '(null)' });
+            }
+            
+            if (items.length === 0) {
+                storageList.innerHTML = `
+                    <div class="empty">
+                        <h3>📭 localStorageは空です</h3>
+                        <p>家族カレンダーアプリを初回起動する場合、これは正常な状態です。</p>
+                        <p><strong>期待されるデータ：</strong></p>
+                        <ul style="text-align: left; display: inline-block;">
+                            <li><code>google-access-token</code> - Google認証トークン</li>
+                            <li><code>google-user-email</code> - ユーザーメールアドレス</li>
+                            <li><code>google-user-name</code> - ユーザー名</li>
+                            <li><code>family-calendar-settings</code> - カレンダー設定</li>
+                        </ul>
+                    </div>`;
+                return;
+            }
+            
+            // 家族カレンダー関連のキーを優先表示
+            items.sort((a, b) => {
+                const aIsFamily = FAMILY_CALENDAR_KEYS.includes(a.key);
+                const bIsFamily = FAMILY_CALENDAR_KEYS.includes(b.key);
+                
+                if (aIsFamily && !bIsFamily) return -1;
+                if (!aIsFamily && bIsFamily) return 1;
+                return a.key.localeCompare(b.key);
+            });
+            
+            storageList.innerHTML = items.map(item => {
+                // 値の適切な表示処理
+                let displayValue = item.value;
+                if (!displayValue || displayValue === '(null)') {
+                    displayValue = '<em style="color: #999;">(空)</em>';
+                } else if (displayValue.length > 50) {
+                    displayValue = escapeHtml(displayValue.substring(0, 50)) + '...';
+                } else {
+                    displayValue = escapeHtml(displayValue);
+                }
+                
+                // 家族カレンダー関連キーの強調表示
+                const isFamily = FAMILY_CALENDAR_KEYS.includes(item.key);
+                const borderColor = isFamily ? '#28a745' : '#007bff';
+                
+                return `
+                <div class="storage-item" style="border-left-color: ${borderColor};">
+                    <div>
+                        <div class="key">
+                            ${isFamily ? '🏠 ' : ''}${escapeHtml(item.key)}
+                        </div>
+                        <div class="value">${displayValue}</div>
+                    </div>
+                    <button onclick="removeItem('${escapeHtml(item.key)}')">削除</button>
+                </div>`;
+            }).join('');
+        }
+        
+        function removeItem(key) {
+            if (confirm(`"${key}" を削除しますか？`)) {
+                localStorage.removeItem(key);
+                displayStorageItems();
+                console.log(`🗑️ Removed: ${key}`);
+            }
+        }
+        
+        function resetAllStorage() {
+            const itemCount = localStorage.length;
+            if (confirm(`すべてのlocalStorage (${itemCount}個) をリセットしますか？\n\nこの操作は元に戻せません。`)) {
+                localStorage.clear();
+                displayStorageItems();
+                console.log('🗑️ All localStorage cleared');
+                alert('✅ localStorageをリセットしました');
+            }
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // 初期表示
+        displayStorageItems();
+        
+        // 5秒ごとに自動更新
+        setInterval(displayStorageItems, 5000);
+    </script>
+</body>
+</html>

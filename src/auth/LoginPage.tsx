@@ -46,14 +46,6 @@ export const LoginPage = () => {
 		console.log("Google Login Failed");
 	};
 
-	const handleMockLogin = () => {
-		login({
-			access_token: "mock-token",
-			email: "demo@example.com",
-			name: "デモユーザー",
-		});
-	};
-
 	return (
 		<div className="h-screen w-screen bg-gray-100 flex items-center justify-center">
 			<div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
@@ -74,19 +66,6 @@ export const LoginPage = () => {
 							size="large"
 							width={300}
 						/>
-					</div>
-
-					<div className="text-center">
-						<p className="text-sm text-gray-500">
-							ログインしなくてもサンプルデータでアプリを体験できます
-						</p>
-						<button
-							type="button"
-							onClick={handleMockLogin}
-							className="mt-2 text-blue-500 hover:text-blue-600 text-sm underline"
-						>
-							サンプルデータで試す
-						</button>
 					</div>
 				</div>
 			</div>

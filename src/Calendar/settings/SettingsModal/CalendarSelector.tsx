@@ -22,22 +22,17 @@ export const CalendarSelector = ({
 		setIsLoading(true);
 		setError(null);
 
-		// モックの場合はデフォルトリストを返す
-		const mockCalendars: GoogleCalendarInfo[] = [
+		// TODO: 実際のGoogleカレンダー一覧取得を実装
+		// 現在はデフォルトリストを返す
+		const defaultCalendars: GoogleCalendarInfo[] = [
 			{
 				id: "primary",
 				summary: "メインカレンダー",
 				primary: true,
 				accessRole: "owner",
 			},
-			{
-				id: "family",
-				summary: "家族カレンダー",
-				primary: false,
-				accessRole: "writer",
-			},
 		];
-		setCalendars(mockCalendars);
+		setCalendars(defaultCalendars);
 		setIsLoading(false);
 	}, []);
 

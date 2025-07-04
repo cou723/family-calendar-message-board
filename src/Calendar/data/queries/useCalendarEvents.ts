@@ -27,6 +27,12 @@ export const useCalendarEvents = ({
 			// 認証状態に応じたデータプロバイダーを取得
 			const dataProvider = getCalendarDataProvider();
 
+			// 認証されていない場合は空配列を返す
+			if (!dataProvider) {
+				console.log("🔒 Not authenticated, returning empty events");
+				return [];
+			}
+
 			// familyCalendarsをFamilyMember[]に変換
 			const familyMembers: FamilyMember[] = familyCalendars.map((config) => ({
 				member: config.member,

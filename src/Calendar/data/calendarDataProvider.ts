@@ -1,12 +1,9 @@
 import { format } from "date-fns";
 import { safeAsync, safeFetch, safeSync } from "../shared/safeStorage";
 import type { CalendarEvent, FamilyMember } from "../shared/types";
-import { MockCalendarDataProvider } from "./MockCalendarDataProvider";
 
-// Tagged Union型定義
-export type CalendarDataProvider =
-	| { type: "mock" }
-	| { type: "google"; accessToken: string };
+// Googleカレンダーのみ対応
+export type CalendarDataProvider = { type: "google"; accessToken: string };
 
 /**
  * 指定した日付の家族全員のカレンダーイベントを取得
@@ -16,19 +13,11 @@ export const getCalendarEvents = async (
 	date: Date,
 	familyMembers: FamilyMember[],
 ): Promise<CalendarEvent[]> => {
-	switch (provider.type) {
-		case "mock": {
-			const mockProvider = new MockCalendarDataProvider();
-			return await mockProvider.getCalendarEvents(date, familyMembers);
-		}
-		case "google": {
-			return await getGoogleCalendarEvents(
-				provider.accessToken,
-				date,
-				familyMembers,
-			);
-		}
-	}
+	return await getGoogleCalendarEvents(
+		provider.accessToken,
+		date,
+		familyMembers,
+	);
 };
 
 /**
@@ -37,15 +26,7 @@ export const getCalendarEvents = async (
 export const getAvailableCalendars = async (
 	provider: CalendarDataProvider,
 ): Promise<{ id: string; name: string; color?: string }[]> => {
-	switch (provider.type) {
-		case "mock": {
-			const mockProvider = new MockCalendarDataProvider();
-			return await mockProvider.getAvailableCalendars();
-		}
-		case "google": {
-			return await getGoogleAvailableCalendars(provider.accessToken);
-		}
-	}
+	return await getGoogleAvailableCalendars(provider.accessToken);
 };
 
 /**

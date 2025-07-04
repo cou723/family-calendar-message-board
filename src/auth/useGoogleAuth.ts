@@ -18,11 +18,7 @@ export const useGoogleAuth = () => {
 		const nameResult = SafeStorage.getItem("google-user-name");
 
 		// アクセストークンがあれば認証済みとして扱う
-		if (
-			tokenResult.success &&
-			tokenResult.data &&
-			tokenResult.data !== "mock-token"
-		) {
+		if (tokenResult.success && tokenResult.data) {
 			setUser({
 				access_token: tokenResult.data,
 				email:
