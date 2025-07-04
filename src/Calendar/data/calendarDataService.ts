@@ -5,9 +5,10 @@ import type { CalendarDataProvider } from "./calendarDataProvider";
  * 認証状態に応じて適切なCalendarDataProviderを取得
  */
 export const getCalendarDataProvider = (): CalendarDataProvider => {
-	// localStorageから直接認証状態を確認
+	// localStorageから直接認証状態を確認（useGoogleAuthと同じ判定基準）
 	const tokenResult = SafeStorage.getItem("google-access-token");
-	const accessToken = tokenResult.success ? tokenResult.data : null;
+	const accessToken =
+		tokenResult.success && tokenResult.data ? tokenResult.data : null;
 	const isAuthenticated = !!accessToken && accessToken !== "mock-token";
 
 	if (!tokenResult.success) {

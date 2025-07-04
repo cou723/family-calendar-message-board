@@ -17,21 +17,23 @@ export const useGoogleAuth = () => {
 		const emailResult = SafeStorage.getItem("google-user-email");
 		const nameResult = SafeStorage.getItem("google-user-name");
 
+		// アクセストークンがあれば認証済みとして扱う
 		if (
 			tokenResult.success &&
 			tokenResult.data &&
-			emailResult.success &&
-			emailResult.data &&
-			nameResult.success &&
-			nameResult.data
+			tokenResult.data !== "mock-token"
 		) {
 			setUser({
 				access_token: tokenResult.data,
-				email: emailResult.data,
-				name: nameResult.data,
+				email:
+					emailResult.success && emailResult.data
+						? emailResult.data
+						: "unknown@example.com",
+				name:
+					nameResult.success && nameResult.data ? nameResult.data : "ユーザー",
 			});
 		} else {
-			// いずれかの取得に失敗した場合はログを出力
+			// トークンがない、または取得に失敗した場合のログ出力
 			if (!tokenResult.success)
 				console.warn("トークン取得失敗:", tokenResult.error);
 			if (!emailResult.success)
