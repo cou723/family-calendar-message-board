@@ -5,19 +5,18 @@ import type {
 	FamilyCalendarConfig,
 	FamilyMember,
 } from "../../shared/types";
-import type { CalendarDataService } from "../CalendarDataService";
+import { getCalendarEvents } from "../calendarDataProvider";
+import { getCalendarDataProvider } from "../calendarDataService";
 
 interface UseCalendarEventsParams {
 	date: Date;
 	familyCalendars: FamilyCalendarConfig[];
-	dataService: CalendarDataService;
 	enabled: boolean;
 }
 
 export const useCalendarEvents = ({
 	date,
 	familyCalendars,
-	dataService,
 	enabled,
 }: UseCalendarEventsParams) => {
 	const dateKey = format(date, "yyyy-MM-dd");
@@ -25,8 +24,8 @@ export const useCalendarEvents = ({
 	return useQuery({
 		queryKey: ["calendarEvents", dateKey, familyCalendars],
 		queryFn: async (): Promise<CalendarEvent[]> => {
-			// CalendarDataServiceを使用してデータプロバイダーを取得
-			const dataProvider = await dataService.getDataProvider();
+			// 認証状態に応じたデータプロバイダーを取得
+			const dataProvider = getCalendarDataProvider();
 
 			// familyCalendarsをFamilyMember[]に変換
 			const familyMembers: FamilyMember[] = familyCalendars.map((config) => ({
@@ -36,8 +35,8 @@ export const useCalendarEvents = ({
 				calendarId: config.calendarIds[0] || "", // 最初のカレンダーIDを使用
 			}));
 
-			// データプロバイダーからイベントを取得
-			return await dataProvider.getCalendarEvents(date, familyMembers);
+			// 関数型アプローチでイベントを取得
+			return await getCalendarEvents(dataProvider, date, familyMembers);
 		},
 		enabled,
 		staleTime: 5 * 60 * 1000, // 5分間はフレッシュ

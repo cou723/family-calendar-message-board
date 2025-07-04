@@ -1,6 +1,4 @@
-import { useMemo } from "react";
 import type { FamilyCalendarConfig } from "../shared/types";
-import { CalendarDataService } from "./CalendarDataService";
 import { useCalendarEvents as useCalendarEventsQuery } from "./queries/useCalendarEvents";
 
 interface UseCalendarEventsProps {
@@ -12,11 +10,6 @@ export const useCalendarEvents = ({
 	currentDate,
 	familyCalendars,
 }: UseCalendarEventsProps) => {
-	// CalendarDataServiceのインスタンスを作成（新しい認証システム使用）
-	const dataService = useMemo(() => {
-		return new CalendarDataService();
-	}, []);
-
 	const {
 		data: events = [],
 		isLoading: isLoadingEvents,
@@ -25,7 +18,6 @@ export const useCalendarEvents = ({
 	} = useCalendarEventsQuery({
 		date: currentDate,
 		familyCalendars,
-		dataService,
 		enabled: true, // 常に有効（内部でモック/実データを切り替え）
 	});
 
@@ -33,8 +25,7 @@ export const useCalendarEvents = ({
 	 * イベントを手動で再取得（TanStack Queryのrefetchを使用）
 	 */
 	const loadEvents = async (): Promise<void> => {
-		// データプロバイダーをリセットして再取得
-		dataService.resetDataProvider();
+		// TanStack Queryのrefetchを使用してデータを再取得
 		refetchEvents();
 	};
 
