@@ -48,10 +48,15 @@ export const useCalendarEvents = ({
 		staleTime: 5 * 60 * 1000, // 5分間はフレッシュ
 		gcTime: 10 * 60 * 1000, // 10分間キャッシュ保持
 		retry: (failureCount, error) => {
-			// Google API エラーの場合はリトライしない
-			if (error instanceof Error && error.message.includes("Google")) {
+			// 認証エラー（401）の場合はリトライしない
+			if (error instanceof Error && error.message.includes("401")) {
 				return false;
 			}
+			// 認証が必要というメッセージの場合もリトライしない
+			if (error instanceof Error && error.message.includes("認証が必要です")) {
+				return false;
+			}
+			// その他のエラーは1回までリトライ
 			return failureCount < 1;
 		},
 	});

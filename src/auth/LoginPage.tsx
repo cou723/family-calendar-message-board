@@ -1,50 +1,38 @@
-import { type CredentialResponse, GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
+import { useGoogleLogin } from "@react-oauth/google";
 import { Navigate, useLocation } from "react-router-dom";
-import { safeSync } from "../Calendar/shared/safeStorage";
 import { useGoogleAuth } from "./useGoogleAuth";
-
-interface GoogleJwtPayload {
-	email: string;
-	name: string;
-	sub: string;
-}
 
 export const LoginPage = () => {
 	const { isAuthenticated, login } = useGoogleAuth();
 	const location = useLocation();
+
+	// カレンダーアクセス用のログイン（アクセストークンを取得）
+	const calendarLogin = useGoogleLogin({
+		onSuccess: async (tokenResponse) => {
+			try {
+				const { fetchGoogleUserInfo } = await import("./googleAuthApi");
+				const userInfo = await fetchGoogleUserInfo(tokenResponse.access_token);
+
+				login({
+					access_token: tokenResponse.access_token,
+					email: userInfo.email,
+					name: userInfo.name,
+				});
+			} catch (error) {
+				console.error("Failed to fetch user info:", error);
+			}
+		},
+		onError: (error) => {
+			console.error("Google Calendar Login Failed:", error);
+		},
+		scope: "https://www.googleapis.com/auth/calendar.readonly",
+	});
 
 	// 認証済みの場合は元のページにリダイレクト
 	if (isAuthenticated) {
 		const from = location.state?.from?.pathname || "/";
 		return <Navigate to={from} replace />;
 	}
-
-	const handleSuccess = (credentialResponse: CredentialResponse) => {
-		if (credentialResponse.credential) {
-			// jwtDecodeを使ってJWTトークンをデコード
-			const decodeResult = safeSync(
-				() =>
-					jwtDecode<GoogleJwtPayload>(credentialResponse.credential as string),
-				"Google credential decode failed",
-			);
-
-			if (!decodeResult.success) {
-				console.error("JWT decode error:", decodeResult.error);
-				return;
-			}
-
-			login({
-				access_token: credentialResponse.credential,
-				email: decodeResult.data.email,
-				name: decodeResult.data.name,
-			});
-		}
-	};
-
-	const handleError = () => {
-		console.log("Google Login Failed");
-	};
 
 	return (
 		<div className="h-screen w-screen bg-gray-100 flex items-center justify-center">
@@ -58,14 +46,13 @@ export const LoginPage = () => {
 					</p>
 
 					<div className="mb-6">
-						<GoogleLogin
-							onSuccess={handleSuccess}
-							onError={handleError}
-							text="signin_with"
-							shape="rectangular"
-							size="large"
-							width={300}
-						/>
+						<button
+							type="button"
+							onClick={() => calendarLogin()}
+							className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+						>
+							Googleカレンダーでログイン
+						</button>
 					</div>
 				</div>
 			</div>

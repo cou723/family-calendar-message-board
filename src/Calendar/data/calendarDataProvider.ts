@@ -1,9 +1,36 @@
 import { format } from "date-fns";
-import { safeAsync, safeFetch, safeSync } from "../shared/safeStorage";
+import {
+	SafeStorage,
+	safeAsync,
+	safeFetch,
+	safeSync,
+} from "../shared/safeStorage";
 import type { CalendarEvent, FamilyMember } from "../shared/types";
 
 // Googleカレンダーのみ対応
 export type CalendarDataProvider = { type: "google"; accessToken: string };
+
+// カレンダーAPIエラー型
+export type CalendarApiError = {
+	type:
+		| "AUTHENTICATION_ERROR"
+		| "PERMISSION_ERROR"
+		| "NETWORK_ERROR"
+		| "UNKNOWN_ERROR";
+	message: string;
+	status?: number;
+};
+
+// 401エラー時のトークン無効化処理
+const handleAuthenticationError = (_calendarId?: string): void => {
+	console.warn("🔐 Authentication error detected. Clearing access token.");
+	// アクセストークンを削除
+	SafeStorage.removeItem("google-access-token");
+	// 認証状態をリセット
+	window.dispatchEvent(
+		new CustomEvent("auth-state-changed", { detail: { authenticated: false } }),
+	);
+};
 
 /**
  * 指定した日付の家族全員のカレンダーイベントを取得
@@ -26,7 +53,15 @@ export const getCalendarEvents = async (
 export const getAvailableCalendars = async (
 	provider: CalendarDataProvider,
 ): Promise<{ id: string; name: string; color?: string }[]> => {
-	return await getGoogleAvailableCalendars(provider.accessToken);
+	try {
+		return await getGoogleAvailableCalendars(provider.accessToken);
+	} catch (error) {
+		if (error instanceof Error && error.message.includes("401")) {
+			handleAuthenticationError();
+			throw new Error("認証が必要です。再度ログインしてください。");
+		}
+		throw error;
+	}
 };
 
 /**
@@ -69,6 +104,14 @@ const getGoogleCalendarEvents = async (
 
 		const response = fetchResult.data;
 		if (!response.ok) {
+			if (response.status === 401) {
+				console.warn(
+					`🔐 Authentication error for ${member.name}. Token may be expired.`,
+				);
+				handleAuthenticationError(member.calendarId);
+				// 401エラーの場合は即座に処理を終了
+				break;
+			}
 			console.error(
 				`Failed to fetch events for ${member.name}:`,
 				response.status,
@@ -145,6 +188,13 @@ const getGoogleAvailableCalendars = async (
 
 	const response = fetchResult.data;
 	if (!response.ok) {
+		if (response.status === 401) {
+			console.warn(
+				"🔐 Authentication error while fetching calendars. Token may be expired.",
+			);
+			handleAuthenticationError();
+			throw new Error("401");
+		}
 		console.error(`Failed to fetch calendars: ${response.status}`);
 		return [];
 	}

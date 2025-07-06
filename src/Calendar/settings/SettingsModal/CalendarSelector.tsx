@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
+import { getAvailableCalendars } from "../../data/calendarDataProvider";
+import { getCalendarDataProvider } from "../../data/calendarDataService";
 import type { GoogleCalendarInfo } from "../../shared/types";
 
 interface CalendarSelectorProps {
@@ -22,17 +24,49 @@ export const CalendarSelector = ({
 		setIsLoading(true);
 		setError(null);
 
-		// TODO: 実際のGoogleカレンダー一覧取得を実装
-		// 現在はデフォルトリストを返す
-		const defaultCalendars: GoogleCalendarInfo[] = [
-			{
-				id: "primary",
-				summary: "メインカレンダー",
-				primary: true,
-				accessRole: "owner",
-			},
-		];
-		setCalendars(defaultCalendars);
+		try {
+			// 認証済みのデータプロバイダーを取得
+			const provider = getCalendarDataProvider();
+			if (!provider) {
+				setError("Googleカレンダーにアクセスするには認証が必要です");
+				setCalendars([]);
+				setIsLoading(false);
+				return;
+			}
+
+			// 実際のGoogleカレンダー一覧を取得
+			const availableCalendars = await getAvailableCalendars(provider);
+
+			// GoogleCalendarInfo形式に変換
+			const calendarInfos: GoogleCalendarInfo[] = availableCalendars.map(
+				(cal) => ({
+					id: cal.id,
+					summary: cal.name,
+					primary: cal.id === "primary",
+					accessRole: "owner", // API戻り値に含まれていないため、デフォルト値を設定
+				}),
+			);
+
+			setCalendars(calendarInfos);
+		} catch (err) {
+			let errorMessage = "カレンダー一覧の取得に失敗しました";
+
+			if (err instanceof Error) {
+				if (err.message.includes("認証が必要です")) {
+					errorMessage =
+						"認証の有効期限が切れています。再度ログインしてください。";
+				} else if (err.message.includes("401")) {
+					errorMessage =
+						"認証の有効期限が切れています。再度ログインしてください。";
+				} else {
+					errorMessage = err.message;
+				}
+			}
+
+			setError(errorMessage);
+			setCalendars([]);
+		}
+
 		setIsLoading(false);
 	}, []);
 
@@ -108,7 +142,16 @@ export const CalendarSelector = ({
 				</div>
 			)}
 
-			{error && <div className="text-sm text-red-600">{error}</div>}
+			{error && (
+				<div className="text-sm text-red-600">
+					{error}
+					{(error.includes("認証") || error.includes("401")) && (
+						<div className="mt-2 text-xs text-gray-600">
+							ページを再読み込みして再度ログインしてください。
+						</div>
+					)}
+				</div>
+			)}
 
 			{!isLoading && !error && calendars.length === 0 && (
 				<div className="text-sm text-gray-600">
