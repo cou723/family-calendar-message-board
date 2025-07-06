@@ -1,3 +1,4 @@
+import { Stack } from "@mantine/core";
 import type { ReactNode } from "react";
 import { useDateNavigation } from "../../shared/useDateNavigation";
 import { useSwipeState } from "./useSwipeState";
@@ -20,12 +21,18 @@ export const TouchNavigationWrapper = ({
 	});
 
 	return (
-		<div
-			className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden"
+		<Stack
+			gap={0}
 			onTouchStart={handleTouchStart}
 			onTouchEnd={handleTouchEnd}
+			style={{
+				height: "100vh",
+				width: "100vw",
+				backgroundColor: "#f3f4f6", // gray-100
+				overflow: "hidden",
+			}}
 		>
 			{children}
-		</div>
+		</Stack>
 	);
 };

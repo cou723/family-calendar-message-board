@@ -1,37 +1,29 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import App from "./App";
 
 describe("App", () => {
-	it("renders Vite + React heading", () => {
+	it("renders login page correctly", () => {
 		render(<App />);
 		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-			"Vite + React",
+			"家族カレンダー",
 		);
 	});
 
-	it("increments count when button is clicked", async () => {
-		const user = userEvent.setup();
+	it("displays login button", () => {
 		render(<App />);
-
-		const button = screen.getByRole("button", { name: /count is/i });
-		expect(button).toHaveTextContent("count is 0");
-
-		await user.click(button);
-		expect(button).toHaveTextContent("count is 1");
-
-		await user.click(button);
-		expect(button).toHaveTextContent("count is 2");
+		const loginButton = screen.getByRole("button", {
+			name: /Googleカレンダーでログイン/i,
+		});
+		expect(loginButton).toBeInTheDocument();
 	});
 
-	it("displays correct links", () => {
+	it("displays app description", () => {
 		render(<App />);
-
-		const viteLink = screen.getByRole("link", { name: /vite logo/i });
-		const reactLink = screen.getByRole("link", { name: /react logo/i });
-
-		expect(viteLink).toHaveAttribute("href", "https://vite.dev");
-		expect(reactLink).toHaveAttribute("href", "https://react.dev");
+		expect(
+			screen.getByText(
+				/Googleアカウントでログインしてご家族の予定を表示します/,
+			),
+		).toBeInTheDocument();
 	});
 });

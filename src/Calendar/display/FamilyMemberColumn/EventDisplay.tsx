@@ -1,3 +1,4 @@
+import { Box, Text } from "@mantine/core";
 import type { CalendarEvent } from "../../shared/types";
 import { formatTime } from "../../shared/utils";
 
@@ -37,32 +38,55 @@ export const EventDisplay = ({
 						return brightness > 155;
 					};
 
-					const textColor = isLightColor(event.color)
-						? "text-gray-800"
-						: "text-white";
+					const textColor = isLightColor(event.color) ? "#374151" : "#ffffff";
 
 					return (
-						<div
+						<Box
 							key={
 								event.id
 									? `event-${event.id}`
 									: `event-${member}-${index}-${event.title}-${event.startHour}`
 							}
-							className={`absolute left-1 right-1 ${textColor} rounded text-base px-3 py-2 shadow-md z-10 overflow-hidden border border-gray-200`}
 							style={{
+								position: "absolute",
+								left: "4px",
+								right: "4px",
 								top: `${topPosition}px`,
 								height: `${height}px`,
 								minHeight: `${Math.max(24, cellHeight * 0.8)}px`,
 								backgroundColor: event.color,
+								color: textColor,
+								borderRadius: "4px",
+								padding: "8px 12px",
+								boxShadow:
+									"0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+								zIndex: 10,
+								overflow: "hidden",
+								border: "1px solid #e5e7eb",
 							}}
 						>
-							<div className="font-semibold leading-tight truncate">
+							<Text
+								fw={600}
+								size="md"
+								style={{
+									lineHeight: "1.25",
+									whiteSpace: "nowrap",
+									overflow: "hidden",
+									textOverflow: "ellipsis",
+								}}
+							>
 								{event.title}
-							</div>
-							<div className="text-sm opacity-90 leading-tight">
+							</Text>
+							<Text
+								size="sm"
+								style={{
+									lineHeight: "1.25",
+									opacity: 0.9,
+								}}
+							>
 								{formatTime(event.startHour)}-{formatTime(event.endHour)}
-							</div>
-						</div>
+							</Text>
+						</Box>
 					);
 				})}
 		</>

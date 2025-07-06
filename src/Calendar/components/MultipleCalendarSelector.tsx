@@ -1,3 +1,13 @@
+import {
+	ActionIcon,
+	Button,
+	ColorSwatch,
+	Group,
+	Paper,
+	Stack,
+	Text,
+	Title,
+} from "@mantine/core";
 import { Plus, X } from "lucide-react";
 import { useState } from "react";
 import type { FamilyCalendarConfig } from "../shared/types";
@@ -48,25 +58,22 @@ export const MultipleCalendarSelector = ({
 	};
 
 	return (
-		<div className="space-y-4">
+		<Stack gap="md">
 			{familyCalendars.map((calendar, index) => (
-				<div
-					key={calendar.id}
-					className="border border-gray-200 rounded-lg p-4 bg-white"
-				>
-					<div className="flex items-center justify-between mb-3">
-						<h4 className="font-medium text-gray-900">
+				<Paper key={calendar.id} p="md" withBorder radius="md">
+					<Group justify="space-between" mb="sm">
+						<Title order={4}>
 							{calendar.name || `家族メンバー ${index + 1}`}
-						</h4>
-						<button
-							type="button"
+						</Title>
+						<ActionIcon
+							color="red"
+							variant="subtle"
 							onClick={() => handleRemoveCalendar(index)}
-							className="text-red-500 hover:text-red-700 p-1"
 							disabled={isLoading}
 						>
-							<X className="w-4 h-4" />
-						</button>
-					</div>
+							<X size={16} />
+						</ActionIcon>
+					</Group>
 
 					{editingIndex === index ? (
 						<CalendarSelector
@@ -78,40 +85,40 @@ export const MultipleCalendarSelector = ({
 							isLoading={isLoading}
 						/>
 					) : (
-						<div className="space-y-2">
-							<div className="flex items-center space-x-2">
-								<div
-									className="w-4 h-4 rounded-full border border-gray-300"
-									style={{ backgroundColor: calendar.color }}
-								/>
-								<span className="text-sm text-gray-600">
+						<Stack gap="sm">
+							<Group gap="sm">
+								<ColorSwatch color={calendar.color} size={16} />
+								<Text size="sm" c="dimmed">
 									{calendar.calendarId || "カレンダーが選択されていません"}
-								</span>
-							</div>
-							<button
-								type="button"
+								</Text>
+							</Group>
+							<Button
+								variant="subtle"
+								size="sm"
 								onClick={() => setEditingIndex(index)}
-								className="text-blue-600 hover:text-blue-800 text-sm"
 								disabled={isLoading}
 							>
 								編集
-							</button>
-						</div>
+							</Button>
+						</Stack>
 					)}
-				</div>
+				</Paper>
 			))}
 
 			{familyCalendars.length < 4 && (
-				<button
-					type="button"
-					onClick={handleAddCalendar}
-					className="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 text-gray-600 hover:border-gray-400 hover:text-gray-800 transition-colors flex items-center justify-center space-x-2"
-					disabled={isLoading}
-				>
-					<Plus className="w-5 h-5" />
-					<span>家族メンバーを追加</span>
-				</button>
+				<Paper p="md" withBorder radius="md" style={{ borderStyle: "dashed" }}>
+					<Button
+						variant="subtle"
+						fullWidth
+						leftSection={<Plus size={20} />}
+						onClick={handleAddCalendar}
+						disabled={isLoading}
+						size="lg"
+					>
+						家族メンバーを追加
+					</Button>
+				</Paper>
 			)}
-		</div>
+		</Stack>
 	);
 };

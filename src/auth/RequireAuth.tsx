@@ -1,3 +1,4 @@
+import { Center, Group, Loader, Paper, Text } from "@mantine/core";
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useGoogleAuth } from "./useGoogleAuth";
@@ -12,14 +13,16 @@ export const RequireAuth = ({ children }: RequireAuthProps) => {
 
 	if (loading) {
 		return (
-			<div className="h-screen w-screen bg-gray-100 flex items-center justify-center">
-				<div className="bg-white rounded-lg shadow-lg p-8">
-					<div className="flex items-center space-x-3">
-						<div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-						<span className="text-gray-700">読み込み中...</span>
-					</div>
-				</div>
-			</div>
+			<Center
+				style={{ height: "100vh", width: "100vw", backgroundColor: "#f3f4f6" }}
+			>
+				<Paper shadow="lg" p="xl" radius="lg">
+					<Group gap="md">
+						<Loader color="blue" size="sm" />
+						<Text c="dimmed">読み込み中...</Text>
+					</Group>
+				</Paper>
+			</Center>
 		);
 	}
 

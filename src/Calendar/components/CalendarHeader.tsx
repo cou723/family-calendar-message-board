@@ -1,3 +1,4 @@
+import { ActionIcon, Paper, Title } from "@mantine/core";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
@@ -8,30 +9,52 @@ export const CalendarHeader = () => {
 	const navigate = useNavigate();
 
 	return (
-		<div className="bg-white shadow-sm p-4 flex-shrink-0 relative">
-			<div
-				className={`text-center px-6 py-4 rounded-lg transition-all duration-300 ${
-					currentDate.isDateChanging ? "bg-green-100 scale-105" : "bg-blue-50"
-				}`}
+		<Paper
+			shadow="sm"
+			p="md"
+			style={{
+				flexShrink: 0,
+				position: "relative",
+				backgroundColor: "white",
+			}}
+		>
+			<Paper
+				p="lg"
+				radius="md"
+				style={{
+					textAlign: "center",
+					backgroundColor: currentDate.isDateChanging ? "#dcfce7" : "#eff6ff", // green-100 : blue-50
+					transform: currentDate.isDateChanging ? "scale(1.05)" : "scale(1)",
+					transition: "all 300ms ease",
+				}}
 			>
-				<h1
-					className={`text-2xl font-bold ${
-						currentDate.isDateChanging ? "text-green-800" : "text-blue-800"
-					}`}
+				<Title
+					order={1}
+					size="2xl"
+					style={{
+						color: currentDate.isDateChanging ? "#14532d" : "#1e40af", // green-800 : blue-800
+					}}
 				>
 					{format(currentDate.date, "yyyy/M/d", { locale: ja })} (
 					{format(currentDate.date, "E", { locale: ja })})
-				</h1>
-			</div>
+				</Title>
+			</Paper>
 
 			{/* 設定ボタン */}
-			<button
-				type="button"
+			<ActionIcon
+				variant="outline"
+				size="xl"
+				radius="xl"
 				onClick={() => navigate("/settings")}
-				className="absolute top-4 right-4 w-12 h-12 bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 rounded-xl flex items-center justify-center text-gray-700 hover:text-gray-900 transition-all shadow-sm hover:shadow-md"
+				style={{
+					position: "absolute",
+					top: 16,
+					right: 16,
+					transition: "all 200ms ease",
+				}}
 			>
-				<span className="text-lg">⚙️</span>
-			</button>
-		</div>
+				<span style={{ fontSize: "1.125rem" }}>⚙️</span>
+			</ActionIcon>
+		</Paper>
 	);
 };

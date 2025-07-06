@@ -1,10 +1,11 @@
+import { Box, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import type {
 	CalendarEvent,
 	CellLayout,
 	FamilyMember,
 } from "../../shared/types";
-import { getCellBackgroundClass } from "../utils/cellBackgroundUtils";
+import { getCellBackgroundStyle } from "../utils/cellBackgroundUtils";
 import { EventDisplay } from "./EventDisplay";
 
 interface FamilyMemberColumnProps {
@@ -32,29 +33,54 @@ export const FamilyMemberColumn = ({
 	}, []);
 
 	return (
-		<div
+		<Box
 			key={member}
-			className="flex-1 min-w-0 border-r border-blue-200 relative"
+			flex={1}
+			style={{
+				minWidth: 0,
+				borderRight: "1px solid #bfdbfe", // blue-200
+				position: "relative",
+			}}
 		>
 			{/* ヘッダー */}
-			<div
-				className={`${color} font-bold text-center border-b-2 border-blue-200 text-lg text-gray-800 flex items-center justify-center`}
-				style={{ height: `${headerHeight}px` }}
+			<Box
+				ta="center"
+				style={{
+					height: `${headerHeight}px`,
+					backgroundColor: color,
+					borderBottom: "2px solid #bfdbfe", // blue-200
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+				}}
 			>
-				{name}
-			</div>
+				<Text fw={700} size="lg" c="#374151">
+					{name}
+				</Text>
+			</Box>
 
 			{/* 時間スロットの背景 */}
-			{Array.from(
-				{ length: endHour - startHour + 1 },
-				(_, i) => i + startHour,
-			).map((hour) => (
-				<div
-					key={`bg-${member}-${hour}`}
-					className={`border-b border-blue-200 ${getCellBackgroundClass({ hour, isCurrentHour: hour === currentHour })}`}
-					style={{ height: `${cellHeight}px` }}
-				/>
-			))}
+			<Box style={{ position: "relative" }}>
+				{Array.from(
+					{ length: endHour - startHour + 1 },
+					(_, i) => i + startHour,
+				).map((hour) => {
+					const backgroundStyle = getCellBackgroundStyle({
+						hour,
+						isCurrentHour: hour === currentHour,
+					});
+					return (
+						<Box
+							key={`bg-${member}-${hour}`}
+							style={{
+								height: `${cellHeight}px`,
+								borderBottom: "1px solid #bfdbfe", // blue-200
+								...backgroundStyle,
+							}}
+						/>
+					);
+				})}
+			</Box>
 
 			{/* イベント表示（絶対位置） */}
 			<EventDisplay
@@ -64,6 +90,6 @@ export const FamilyMemberColumn = ({
 				headerHeight={headerHeight}
 				events={events}
 			/>
-		</div>
+		</Box>
 	);
 };

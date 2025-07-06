@@ -1,3 +1,16 @@
+import {
+	Alert,
+	Box,
+	Button,
+	Container,
+	Group,
+	Paper,
+	SimpleGrid,
+	Stack,
+	Tabs,
+	Text,
+	Title,
+} from "@mantine/core";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -22,55 +35,43 @@ export const SettingsPage = () => {
 	};
 
 	return (
-		<div className="min-h-screen bg-gray-50 p-4">
-			<div className="max-w-3xl mx-auto">
-				{/* ヘッダー */}
-				<div className="flex items-center mb-6">
-					<button
-						type="button"
-						onClick={() => navigate("/")}
-						className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
-					>
-						<ArrowLeft className="w-5 h-5 mr-2" />
-						カレンダーに戻る
-					</button>
-				</div>
+		<Container size="lg" py="xl">
+			{/* ヘッダー */}
+			<Group mb="xl">
+				<Button
+					variant="subtle"
+					leftSection={<ArrowLeft size={20} />}
+					onClick={() => navigate("/")}
+					size="md"
+				>
+					カレンダーに戻る
+				</Button>
+			</Group>
 
-				{/* タイトル */}
-				<h1 className="text-2xl font-bold text-gray-900 mb-8">設定</h1>
+			{/* タイトル */}
+			<Title order={1} mb="xl">
+				設定
+			</Title>
 
-				{/* タブメニュー */}
-				<div className="bg-white rounded-lg shadow-sm">
-					<div className="flex border-b border-gray-200">
-						<button
-							type="button"
-							onClick={() => setActiveTab("time")}
-							className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
-								activeTab === "time"
-									? "text-blue-600 border-b-2 border-blue-600"
-									: "text-gray-600 hover:text-gray-800"
-							}`}
-						>
+			{/* タブメニュー */}
+			<Paper shadow="sm" radius="md" withBorder>
+				<Tabs
+					value={activeTab}
+					onChange={(value) => setActiveTab(value as "time" | "calendar")}
+				>
+					<Tabs.List>
+						<Tabs.Tab value="time" fw={500} size="lg">
 							表示時間
-						</button>
-						<button
-							type="button"
-							onClick={() => setActiveTab("calendar")}
-							className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
-								activeTab === "calendar"
-									? "text-blue-600 border-b-2 border-blue-600"
-									: "text-gray-600 hover:text-gray-800"
-							}`}
-						>
+						</Tabs.Tab>
+						<Tabs.Tab value="calendar" fw={500} size="lg">
 							カレンダー
-						</button>
-					</div>
+						</Tabs.Tab>
+					</Tabs.List>
 
-					{/* タブコンテンツ */}
-					<div className="p-6">
-						{activeTab === "time" && (
-							<div className="space-y-6">
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+					<Box p="xl">
+						<Tabs.Panel value="time">
+							<Stack gap="xl">
+								<SimpleGrid cols={{ base: 1, md: 2 }}>
 									<TimeRangeInput
 										label="開始時間"
 										value={timeRange.startHour}
@@ -83,31 +84,35 @@ export const SettingsPage = () => {
 										onChange={settingsControl.setEndHour}
 										min={timeRange.startHour + 1}
 									/>
-								</div>
+								</SimpleGrid>
 
-								<div className="text-sm text-gray-600 text-center bg-gray-50 p-4 rounded-lg">
-									表示時間: {timeRange.endHour - timeRange.startHour + 1}時間
-								</div>
+								<Alert variant="light" color="blue" radius="md">
+									<Text size="md" ta="center">
+										表示時間: {timeRange.endHour - timeRange.startHour + 1}時間
+									</Text>
+								</Alert>
 
-								<div className="text-sm text-gray-500">
-									<p>• 表示する時間帯を設定できます</p>
-									<p>
+								<Stack gap="xs">
+									<Text size="sm" c="dimmed">
+										• 表示する時間帯を設定できます
+									</Text>
+									<Text size="sm" c="dimmed">
 										•
 										開始時間は0-23時、終了時間は開始時間+1-23時の範囲で選択可能です
-									</p>
-								</div>
-							</div>
-						)}
+									</Text>
+								</Stack>
+							</Stack>
+						</Tabs.Panel>
 
-						{activeTab === "calendar" && (
+						<Tabs.Panel value="calendar">
 							<CalendarSettingsTab
 								familyCalendars={familyCalendars}
 								onUpdateCalendars={updateCalendars}
 							/>
-						)}
-					</div>
-				</div>
-			</div>
-		</div>
+						</Tabs.Panel>
+					</Box>
+				</Tabs>
+			</Paper>
+		</Container>
 	);
 };

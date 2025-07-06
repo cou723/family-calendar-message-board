@@ -1,3 +1,5 @@
+import { Select } from "@mantine/core";
+
 interface TimeRangeInputProps {
 	label: string;
 	value: number;
@@ -13,27 +15,22 @@ export const TimeRangeInput = ({
 	min = 0,
 	max = 23,
 }: TimeRangeInputProps) => {
-	const id = `time-range-${label.replace(/\s+/g, "-").toLowerCase()}`;
+	const options = Array.from({ length: max - min + 1 }, (_, i) => {
+		const hour = min + i;
+		return {
+			value: hour.toString(),
+			label: `${hour}:00`,
+		};
+	});
 
 	return (
-		<div className="space-y-2">
-			<label htmlFor={id} className="block text-sm font-medium text-gray-700">
-				{label}
-			</label>
-			<select
-				id={id}
-				value={value}
-				onChange={(e) => onChange(Number(e.target.value))}
-				className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-			>
-				{Array.from({ length: max - min + 1 }, (_, i) => min + i).map(
-					(hour) => (
-						<option key={hour} value={hour}>
-							{hour}:00
-						</option>
-					),
-				)}
-			</select>
-		</div>
+		<Select
+			label={label}
+			value={value.toString()}
+			onChange={(val) => onChange(Number(val))}
+			data={options}
+			size="md"
+			withAsterisk={false}
+		/>
 	);
 };

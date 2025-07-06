@@ -1,3 +1,4 @@
+import { Stack, Text, Title } from "@mantine/core";
 import { useState } from "react";
 import type { FamilyCalendarConfig } from "../shared/types";
 import { MultipleCalendarSelector } from "./MultipleCalendarSelector";
@@ -23,15 +24,13 @@ export const CalendarSettingsTab = ({
 	};
 
 	return (
-		<div className="space-y-6">
-			<div>
-				<h3 className="text-lg font-medium text-gray-900 mb-4">
-					家族カレンダーの設定
-				</h3>
-				<p className="text-sm text-gray-600 mb-4">
+		<Stack gap="xl">
+			<Stack gap="md">
+				<Title order={3}>家族カレンダーの設定</Title>
+				<Text size="sm" c="dimmed">
 					表示する家族メンバーのカレンダーを選択してください。
-				</p>
-			</div>
+				</Text>
+			</Stack>
 
 			<MultipleCalendarSelector
 				familyCalendars={familyCalendars}
@@ -39,11 +38,17 @@ export const CalendarSettingsTab = ({
 				isLoading={isLoading}
 			/>
 
-			<div className="text-xs text-gray-500 space-y-1">
-				<p>• 最大4人分のカレンダーを表示できます</p>
-				<p>• カレンダーの順序は表示順序に影響します</p>
-				<p>• 変更は自動的に保存されます</p>
-			</div>
-		</div>
+			<Stack gap="xs">
+				<Text size="xs" c="dimmed">
+					• 最大4人分のカレンダーを表示できます
+				</Text>
+				<Text size="xs" c="dimmed">
+					• カレンダーの順序は表示順序に影響します
+				</Text>
+				<Text size="xs" c="dimmed">
+					• 変更は自動的に保存されます
+				</Text>
+			</Stack>
+		</Stack>
 	);
 };

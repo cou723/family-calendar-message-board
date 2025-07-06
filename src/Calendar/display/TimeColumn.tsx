@@ -1,6 +1,7 @@
+import { Box, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import type { CellLayout } from "../shared/types";
-import { getTimeColumnBackgroundClass } from "./utils/cellBackgroundUtils";
+import { getTimeColumnBackgroundStyle } from "./utils/cellBackgroundUtils";
 
 interface TimeColumnProps {
 	cellLayout: CellLayout;
@@ -18,33 +19,61 @@ export const TimeColumn = ({ cellLayout }: TimeColumnProps) => {
 		const interval = setInterval(updateCurrentHour, 60000);
 		return () => clearInterval(interval);
 	}, []);
+
 	return (
-		<div className="w-14 bg-blue-50 border-r-2 border-blue-200 flex-shrink-0">
-			<div
-				className="font-bold text-center border-b-2 border-blue-200 text-lg bg-blue-100 text-blue-900 flex items-center justify-center"
-				style={{ height: `${headerHeight}px` }}
+		<Box
+			w={56}
+			style={{
+				backgroundColor: "#eff6ff", // blue-50
+				borderRight: "2px solid #bfdbfe", // blue-200
+				flexShrink: 0,
+			}}
+		>
+			<Box
+				ta="center"
+				style={{
+					height: `${headerHeight}px`,
+					backgroundColor: "#dbeafe", // blue-100
+					borderBottom: "2px solid #bfdbfe", // blue-200
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+				}}
 			>
-				時間
-			</div>
-			{Array.from(
-				{ length: endHour - startHour + 1 },
-				(_, i) => i + startHour,
-			).map((hour) => {
-				const isCurrentHour = hour === currentHour;
-				const backgroundClass = getTimeColumnBackgroundClass({
-					hour,
-					isCurrentHour,
-				});
-				return (
-					<div
-						key={`time-${hour}`}
-						className={`border-b border-blue-200 text-center text-lg flex items-center justify-center font-medium ${backgroundClass}`}
-						style={{ height: `${cellHeight}px` }}
-					>
-						{hour}
-					</div>
-				);
-			})}
-		</div>
+				<Text fw={700} size="lg" c="#1e3a8a">
+					時間
+				</Text>
+			</Box>
+			<Box>
+				{Array.from(
+					{ length: endHour - startHour + 1 },
+					(_, i) => i + startHour,
+				).map((hour) => {
+					const isCurrentHour = hour === currentHour;
+					const backgroundStyle = getTimeColumnBackgroundStyle({
+						hour,
+						isCurrentHour,
+					});
+					return (
+						<Box
+							key={`time-${hour}`}
+							ta="center"
+							style={{
+								height: `${cellHeight}px`,
+								borderBottom: "1px solid #bfdbfe", // blue-200
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								...backgroundStyle,
+							}}
+						>
+							<Text size="lg" fw={500}>
+								{hour}
+							</Text>
+						</Box>
+					);
+				})}
+			</Box>
+		</Box>
 	);
 };

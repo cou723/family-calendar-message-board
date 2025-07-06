@@ -1,3 +1,4 @@
+import { Box, Center, Loader, Overlay, Stack, Text } from "@mantine/core";
 import type { CellLayout, FamilyMember } from "../shared/types";
 
 interface EventsLoadingPlaceholderProps {
@@ -14,43 +15,66 @@ export const EventsLoadingPlaceholder = ({
 	return (
 		<>
 			{familyMembers.map((familyMember) => (
-				<div
+				<Box
 					key={`loading-${familyMember.member}`}
-					className="flex-1 min-w-0 border-r border-blue-200 relative"
+					flex={1}
+					style={{
+						minWidth: 0,
+						borderRight: "1px solid #bfdbfe", // blue-200
+						position: "relative",
+					}}
 				>
 					{/* ヘッダー */}
-					<div
-						className={`${familyMember.color} font-bold text-center border-b-2 border-blue-200 text-lg text-gray-800 flex items-center justify-center`}
-						style={{ height: `${headerHeight}px` }}
+					<Box
+						ta="center"
+						style={{
+							height: `${headerHeight}px`,
+							backgroundColor: familyMember.color,
+							borderBottom: "2px solid #bfdbfe", // blue-200
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+						}}
 					>
-						{familyMember.name}
-					</div>
+						<Text fw={700} size="lg" c="#374151">
+							{familyMember.name}
+						</Text>
+					</Box>
 
 					{/* 時間スロットの背景 */}
-					{Array.from(
-						{ length: endHour - startHour + 1 },
-						(_, i) => i + startHour,
-					).map((hour) => (
-						<div
-							key={`bg-loading-${familyMember.member}-${hour}`}
-							className="border-b border-blue-200"
-							style={{ height: `${cellHeight}px` }}
-						/>
-					))}
+					<Box>
+						{Array.from(
+							{ length: endHour - startHour + 1 },
+							(_, i) => i + startHour,
+						).map((hour) => (
+							<Box
+								key={`bg-loading-${familyMember.member}-${hour}`}
+								style={{
+									height: `${cellHeight}px`,
+									borderBottom: "1px solid #bfdbfe", // blue-200
+								}}
+							/>
+						))}
+					</Box>
 
 					{/* ローディングアニメーション */}
-					<div
-						className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50"
-						style={{ top: `${headerHeight}px` }}
+					<Overlay
+						backgroundOpacity={0.5}
+						style={{
+							top: `${headerHeight}px`,
+							backgroundColor: "rgba(255, 255, 255, 0.5)",
+						}}
 					>
-						<div className="flex flex-col items-center space-y-2">
-							<div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-							<span className="text-sm text-blue-600 font-medium">
-								読み込み中...
-							</span>
-						</div>
-					</div>
-				</div>
+						<Center h="100%">
+							<Stack gap="sm" align="center">
+								<Loader color="blue" size="md" />
+								<Text size="sm" c="blue" fw={500}>
+									読み込み中...
+								</Text>
+							</Stack>
+						</Center>
+					</Overlay>
+				</Box>
 			))}
 		</>
 	);

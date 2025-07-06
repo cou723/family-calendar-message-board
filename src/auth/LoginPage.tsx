@@ -1,3 +1,12 @@
+import {
+	Button,
+	Center,
+	Container,
+	Paper,
+	Stack,
+	Text,
+	Title,
+} from "@mantine/core";
 import { useGoogleLogin } from "@react-oauth/google";
 import { Navigate, useLocation } from "react-router-dom";
 import { useGoogleAuth } from "./useGoogleAuth";
@@ -35,27 +44,27 @@ export const LoginPage = () => {
 	}
 
 	return (
-		<div className="h-screen w-screen bg-gray-100 flex items-center justify-center">
-			<div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
-				<div className="text-center">
-					<h1 className="text-3xl font-bold text-gray-800 mb-2">
-						家族カレンダー
-					</h1>
-					<p className="text-gray-600 mb-8">
-						Googleアカウントでログインしてご家族の予定を表示します
-					</p>
+		<Center
+			style={{ height: "100vh", width: "100vw", backgroundColor: "#f3f4f6" }}
+		>
+			<Container size="sm">
+				<Paper shadow="lg" p="xl" radius="lg" ta="center" withBorder>
+					<Stack gap="xl">
+						<Stack gap="sm">
+							<Title order={1} size="3xl" c="#374151">
+								家族カレンダー
+							</Title>
+							<Text size="md" c="dimmed">
+								Googleアカウントでログインしてご家族の予定を表示します
+							</Text>
+						</Stack>
 
-					<div className="mb-6">
-						<button
-							type="button"
-							onClick={() => calendarLogin()}
-							className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-lg transition-colors"
-						>
+						<Button onClick={() => calendarLogin()} size="lg" fullWidth>
 							Googleカレンダーでログイン
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
+						</Button>
+					</Stack>
+				</Paper>
+			</Container>
+		</Center>
 	);
 };
