@@ -31,8 +31,9 @@ export interface CalendarEvent {
 
 // 家族メンバーのカレンダー設定
 export interface FamilyCalendarConfig {
+	id: string;
 	member: string;
-	calendarIds: string[]; // 複数のカレンダーID
+	calendarId: string; // 単一のカレンダーID（UIを統一するため）
 	name: string;
 	color: string; // bgColorからcolorに統一
 }

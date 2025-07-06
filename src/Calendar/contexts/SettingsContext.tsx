@@ -5,10 +5,6 @@ interface SettingsContextType {
 		startHour: number;
 		endHour: number;
 	};
-	settingsModal: {
-		isOpen: boolean;
-		setIsOpen: (isOpen: boolean) => void;
-	};
 	settingsControl: {
 		setStartHour: (hour: number) => void;
 		setEndHour: (hour: number) => void;
@@ -24,16 +20,11 @@ interface SettingsProviderProps {
 export const SettingsProvider = ({ children }: SettingsProviderProps) => {
 	const [startHour, setStartHour] = useState(6);
 	const [endHour, setEndHour] = useState(23);
-	const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
 	const value: SettingsContextType = {
 		timeRange: {
 			startHour,
 			endHour,
-		},
-		settingsModal: {
-			isOpen: isSettingsModalOpen,
-			setIsOpen: setIsSettingsModalOpen,
 		},
 		settingsControl: {
 			setStartHour,

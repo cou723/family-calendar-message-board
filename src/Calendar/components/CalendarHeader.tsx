@@ -1,11 +1,11 @@
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
+import { useNavigate } from "react-router-dom";
 import { useDateNavigation } from "../shared/useDateNavigation";
-import { useSettings } from "../shared/useSettings";
 
 export const CalendarHeader = () => {
 	const { currentDate } = useDateNavigation();
-	const { settingsModal } = useSettings();
+	const navigate = useNavigate();
 
 	return (
 		<div className="bg-white shadow-sm p-4 flex-shrink-0 relative">
@@ -27,7 +27,7 @@ export const CalendarHeader = () => {
 			{/* 設定ボタン */}
 			<button
 				type="button"
-				onClick={() => settingsModal.setIsOpen(true)}
+				onClick={() => navigate("/settings")}
 				className="absolute top-4 right-4 w-12 h-12 bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 rounded-xl flex items-center justify-center text-gray-700 hover:text-gray-900 transition-all shadow-sm hover:shadow-md"
 			>
 				<span className="text-lg">⚙️</span>

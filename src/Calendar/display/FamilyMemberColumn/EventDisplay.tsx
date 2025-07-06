@@ -26,6 +26,21 @@ export const EventDisplay = ({
 						(event.startHour - startHour) * cellHeight + headerHeight;
 					const height = duration * cellHeight;
 
+					// 色の明度を判定して文字色を決定
+					const isLightColor = (color: string): boolean => {
+						const hex = color.replace("#", "");
+						const r = parseInt(hex.substr(0, 2), 16);
+						const g = parseInt(hex.substr(2, 2), 16);
+						const b = parseInt(hex.substr(4, 2), 16);
+						// 明度計算（0.299*R + 0.587*G + 0.114*B）
+						const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+						return brightness > 155;
+					};
+
+					const textColor = isLightColor(event.color)
+						? "text-gray-800"
+						: "text-white";
+
 					return (
 						<div
 							key={
@@ -33,11 +48,12 @@ export const EventDisplay = ({
 									? `event-${event.id}`
 									: `event-${member}-${index}-${event.title}-${event.startHour}`
 							}
-							className={`absolute left-1 right-1 ${event.color} text-white rounded text-base px-3 py-2 shadow-sm z-10 overflow-hidden`}
+							className={`absolute left-1 right-1 ${textColor} rounded text-base px-3 py-2 shadow-md z-10 overflow-hidden border border-gray-200`}
 							style={{
 								top: `${topPosition}px`,
 								height: `${height}px`,
 								minHeight: `${Math.max(24, cellHeight * 0.8)}px`,
+								backgroundColor: event.color,
 							}}
 						>
 							<div className="font-semibold leading-tight truncate">

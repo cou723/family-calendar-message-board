@@ -5,8 +5,9 @@ import type { FamilyCalendarConfig } from "../shared/types";
 
 // Valibotスキーマでバリデーション
 const FamilyCalendarConfigSchema = object({
+	id: string(),
 	member: string(),
-	calendarIds: array(string()),
+	calendarId: string(),
 	name: string(),
 	color: string(),
 });
@@ -15,28 +16,32 @@ const FamilyCalendarConfigArraySchema = array(FamilyCalendarConfigSchema);
 
 const getDefaultFamilyCalendars = (): FamilyCalendarConfig[] => [
 	{
+		id: "father",
 		member: "father",
-		calendarIds: ["primary"],
+		calendarId: "primary",
 		name: "お父さん",
-		color: "bg-blue-100",
+		color: "#1d4ed8", // より濃い青
 	},
 	{
+		id: "mother",
 		member: "mother",
-		calendarIds: ["primary"],
+		calendarId: "primary",
 		name: "お母さん",
-		color: "bg-red-100",
+		color: "#dc2626", // より濃い赤
 	},
 	{
+		id: "son1",
 		member: "son1",
-		calendarIds: ["primary"],
+		calendarId: "primary",
 		name: "長男",
-		color: "bg-green-100",
+		color: "#059669", // より濃い緑
 	},
 	{
+		id: "son2",
 		member: "son2",
-		calendarIds: ["primary"],
+		calendarId: "primary",
 		name: "次男",
-		color: "bg-yellow-100",
+		color: "#d97706", // より濃いオレンジ
 	},
 ];
 
@@ -100,6 +105,7 @@ export const useFamilyCalendars = () => {
 
 	return {
 		familyCalendars,
+		updateCalendars: updateFamilyCalendars,
 		updateFamilyCalendars,
 	};
 };

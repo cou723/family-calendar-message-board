@@ -32,7 +32,7 @@ export const CalendarGrid = () => {
 		member: calendar.member,
 		name: calendar.name,
 		color: calendar.color,
-		calendarId: calendar.calendarIds[0] || "", // 最初のカレンダーIDを使用
+		calendarId: calendar.calendarId, // 単一のカレンダーIDを使用
 	}));
 
 	return (
