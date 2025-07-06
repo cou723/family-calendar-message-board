@@ -1,0 +1,74 @@
+# Vercel Git Integrationを使用して自動デプロイを行うため、
+# このGitHub Actionsワークフローは品質チェックのみ実行します
+
+name: Quality Check for Frontend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'biome.json'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'biome.json'
+  workflow_dispatch:
+
+jobs:
+  quality-check:
+    name: Run Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run type check
+        run: pnpm run typecheck
+
+      - name: Run linting
+        run: pnpm run lint
+
+      - name: Run tests
+        run: pnpm run test:run
+
+      - name: Build check
+        run: pnpm run build
+        env:
+          VITE_API_BASE_URL: https://family-calendar-api.deno.dev
+
+      - name: Deployment Status
+        run: |
+          echo "ℹ️ デプロイはVercel Git Integrationで自動実行されます"
+          echo "🔗 Vercelダッシュボード: https://vercel.com/dashboard"
+          echo "🌐 サイトURL: https://family-calendar-message-board.vercel.app"
