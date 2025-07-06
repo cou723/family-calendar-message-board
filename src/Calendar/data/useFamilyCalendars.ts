@@ -7,7 +7,7 @@ import type { FamilyCalendarConfig } from "../shared/types";
 const FamilyCalendarConfigSchema = object({
 	id: string(),
 	member: string(),
-	calendarId: string(),
+	calendarIds: array(string()),
 	name: string(),
 	color: string(),
 });
@@ -18,28 +18,28 @@ const getDefaultFamilyCalendars = (): FamilyCalendarConfig[] => [
 	{
 		id: "father",
 		member: "father",
-		calendarId: "primary",
+		calendarIds: [],
 		name: "お父さん",
 		color: "#1d4ed8", // より濃い青
 	},
 	{
 		id: "mother",
 		member: "mother",
-		calendarId: "primary",
+		calendarIds: [],
 		name: "お母さん",
 		color: "#dc2626", // より濃い赤
 	},
 	{
 		id: "son1",
 		member: "son1",
-		calendarId: "primary",
+		calendarIds: [],
 		name: "長男",
 		color: "#059669", // より濃い緑
 	},
 	{
 		id: "son2",
 		member: "son2",
-		calendarId: "primary",
+		calendarIds: [],
 		name: "次男",
 		color: "#d97706", // より濃いオレンジ
 	},

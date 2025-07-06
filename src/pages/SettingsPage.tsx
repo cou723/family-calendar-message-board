@@ -5,7 +5,7 @@ import {
 	Container,
 	Group,
 	Paper,
-	SimpleGrid,
+	RangeSlider,
 	Stack,
 	Tabs,
 	Text,
@@ -15,23 +15,17 @@ import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CalendarSettingsTab } from "../Calendar/components/CalendarSettingsTab";
-import { TimeRangeInput } from "../Calendar/components/TimeRangeInput";
-import { useFamilyCalendars } from "../Calendar/data/useFamilyCalendars";
 import { useSettings } from "../Calendar/shared/useSettings";
 
 export const SettingsPage = () => {
 	const navigate = useNavigate();
 	const [activeTab, setActiveTab] = useState<"time" | "calendar">("time");
-	const { timeRange, settingsControl } = useSettings();
-	const { familyCalendars, updateCalendars } = useFamilyCalendars();
+	const { timeRange, settingsControl, familyCalendars, setFamilyCalendars } =
+		useSettings();
 
-	// 開始時間変更時の整合性チェック
-	const handleStartHourChange = (newStartHour: number) => {
-		settingsControl.setStartHour(newStartHour);
-		// 開始時間が終了時間以上になった場合、終了時間を開始時間+1に調整
-		if (newStartHour >= timeRange.endHour) {
-			settingsControl.setEndHour(Math.min(newStartHour + 1, 23));
-		}
+	// 時間範囲変更時の処理
+	const handleTimeRangeChange = (value: [number, number]) => {
+		settingsControl.setTimeRange(value);
 	};
 
 	return (
@@ -71,34 +65,42 @@ export const SettingsPage = () => {
 					<Box p="xl">
 						<Tabs.Panel value="time">
 							<Stack gap="xl">
-								<SimpleGrid cols={{ base: 1, md: 2 }}>
-									<TimeRangeInput
-										label="開始時間"
-										value={timeRange.startHour}
-										onChange={handleStartHourChange}
+								<Box>
+									<Text size="lg" fw={500} mb="md">
+										表示時間範囲
+									</Text>
+									<RangeSlider
+										value={[timeRange.startHour, timeRange.endHour]}
+										onChange={handleTimeRangeChange}
+										min={0}
+										max={23}
+										step={1}
+										minRange={1}
+										size="xl"
+										color="blue"
+										marks={[
+											{ value: 0, label: "0時" },
+											{ value: 6, label: "6時" },
+											{ value: 12, label: "12時" },
+											{ value: 18, label: "18時" },
+											{ value: 23, label: "23時" },
+										]}
 									/>
-
-									<TimeRangeInput
-										label="終了時間"
-										value={timeRange.endHour}
-										onChange={settingsControl.setEndHour}
-										min={timeRange.startHour + 1}
-									/>
-								</SimpleGrid>
+								</Box>
 
 								<Alert variant="light" color="blue" radius="md">
 									<Text size="md" ta="center">
-										表示時間: {timeRange.endHour - timeRange.startHour + 1}時間
+										表示時間: {timeRange.startHour}時 〜 {timeRange.endHour}時 (
+										{timeRange.endHour - timeRange.startHour + 1}時間)
 									</Text>
 								</Alert>
 
 								<Stack gap="xs">
 									<Text size="sm" c="dimmed">
-										• 表示する時間帯を設定できます
+										• スライダーで表示する時間帯を設定できます
 									</Text>
 									<Text size="sm" c="dimmed">
-										•
-										開始時間は0-23時、終了時間は開始時間+1-23時の範囲で選択可能です
+										• 最低1時間の範囲は必要です
 									</Text>
 								</Stack>
 							</Stack>
@@ -107,7 +109,7 @@ export const SettingsPage = () => {
 						<Tabs.Panel value="calendar">
 							<CalendarSettingsTab
 								familyCalendars={familyCalendars}
-								onUpdateCalendars={updateCalendars}
+								onUpdateCalendars={setFamilyCalendars}
 							/>
 						</Tabs.Panel>
 					</Box>

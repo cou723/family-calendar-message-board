@@ -11,7 +11,7 @@ export interface FamilyMember {
 	member: string;
 	name: string;
 	color: string;
-	calendarId: string;
+	calendarIds: string[]; // 複数のカレンダーID
 }
 
 // カレンダーイベントの型定義
@@ -33,7 +33,7 @@ export interface CalendarEvent {
 export interface FamilyCalendarConfig {
 	id: string;
 	member: string;
-	calendarId: string; // 単一のカレンダーID（UIを統一するため）
+	calendarIds: string[]; // 複数のカレンダーID
 	name: string;
 	color: string; // bgColorからcolorに統一
 }

@@ -33,7 +33,7 @@ export const MultipleCalendarSelector = ({
 			id: `new-${Date.now()}`,
 			member: `member-${familyCalendars.length + 1}`,
 			name: `家族メンバー ${familyCalendars.length + 1}`,
-			calendarId: "",
+			calendarIds: [],
 			color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
 		};
 
@@ -89,7 +89,9 @@ export const MultipleCalendarSelector = ({
 							<Group gap="sm">
 								<ColorSwatch color={calendar.color} size={16} />
 								<Text size="sm" c="dimmed">
-									{calendar.calendarId || "カレンダーが選択されていません"}
+									{calendar.calendarIds.length > 0
+										? `${calendar.calendarIds.length}個のカレンダーが選択されています`
+										: "カレンダーが選択されていません"}
 								</Text>
 							</Group>
 							<Button

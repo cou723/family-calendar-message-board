@@ -1,6 +1,5 @@
 import { Box, ScrollArea } from "@mantine/core";
-import { useCalendarEvents } from "../../data/useCalendarEvents";
-import { useFamilyCalendars } from "../../data/useFamilyCalendars";
+import { useCalendarEvents } from "../../data/queries/useCalendarEvents";
 import { EventsLoadingPlaceholder } from "../../display/EventsLoadingPlaceholder";
 import { FamilyMemberColumn } from "../../display/FamilyMemberColumn";
 import { TimeColumn } from "../../display/TimeColumn";
@@ -10,16 +9,16 @@ import { useSettings } from "../../shared/useSettings";
 import { useCellLayout } from "./useCellLayout";
 
 export const CalendarGrid = () => {
-	const { timeRange } = useSettings();
+	const { timeRange, familyCalendars } = useSettings();
 	const { cellHeight, headerHeight } = useCellLayout(
 		timeRange.startHour,
 		timeRange.endHour,
 	);
 	const { currentDate } = useDateNavigation();
-	const { familyCalendars } = useFamilyCalendars();
-	const { events, isLoadingEvents } = useCalendarEvents({
-		currentDate: currentDate.date,
+	const { data: events, isLoading: isLoadingEvents } = useCalendarEvents({
+		date: currentDate.date,
 		familyCalendars,
+		enabled: true,
 	});
 
 	const cell = {
@@ -33,7 +32,7 @@ export const CalendarGrid = () => {
 		member: calendar.member,
 		name: calendar.name,
 		color: calendar.color,
-		calendarId: calendar.calendarId, // 単一のカレンダーIDを使用
+		calendarIds: calendar.calendarIds,
 	}));
 
 	return (
@@ -61,7 +60,7 @@ export const CalendarGrid = () => {
 								key={familyMember.member}
 								familyMember={familyMember}
 								cellLayout={cell}
-								events={events}
+								events={events || []}
 							/>
 						))
 					)}

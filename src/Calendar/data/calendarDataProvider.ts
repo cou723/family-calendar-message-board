@@ -79,85 +79,92 @@ const getGoogleCalendarEvents = async (
 	const allEvents: CalendarEvent[] = [];
 
 	for (const member of familyMembers) {
-		if (!member.calendarId) continue;
+		if (!member.calendarIds || member.calendarIds.length === 0) continue;
 
-		console.log(`📅 Fetching events for ${member.name} (${member.calendarId})`);
+		for (const calendarId of member.calendarIds) {
+			console.log(`📅 Fetching events for ${member.name} (${calendarId})`);
 
-		const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(
-			member.calendarId,
-		)}/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
+			const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(
+				calendarId,
+			)}/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
 
-		const fetchResult = await safeFetch(url, {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-				"Content-Type": "application/json",
-			},
-		});
-
-		if (!fetchResult.success) {
-			console.error(
-				`Failed to fetch events for ${member.name}:`,
-				fetchResult.error,
-			);
-			continue;
-		}
-
-		const response = fetchResult.data;
-		if (!response.ok) {
-			if (response.status === 401) {
-				console.warn(
-					`🔐 Authentication error for ${member.name}. Token may be expired.`,
-				);
-				handleAuthenticationError(member.calendarId);
-				// 401エラーの場合は即座に処理を終了
-				break;
-			}
-			console.error(
-				`Failed to fetch events for ${member.name}:`,
-				response.status,
-			);
-			continue;
-		}
-
-		const jsonResult = await safeAsync(
-			() => response.json(),
-			`Failed to parse JSON for ${member.name}`,
-		);
-
-		if (!jsonResult.success) {
-			console.error(`JSON parse error for ${member.name}:`, jsonResult.error);
-			continue;
-		}
-
-		const data = jsonResult.data;
-		console.log(
-			`📊 Found ${data.items?.length || 0} events for ${member.name}`,
-		);
-
-		if (data.items) {
-			const memberEvents = data.items.map((event: Record<string, unknown>) => {
-				const start = event.start as
-					| { dateTime?: string; date?: string }
-					| undefined;
-				const end = event.end as
-					| { dateTime?: string; date?: string }
-					| undefined;
-				const startTimeStr = start?.dateTime || start?.date || "";
-				const endTimeStr = end?.dateTime || end?.date || "";
-
-				return {
-					id: event.id as string,
-					title: (event.summary as string) || "(タイトルなし)",
-					startTime: startTimeStr,
-					endTime: endTimeStr,
-					startHour: parseHour(startTimeStr),
-					endHour: parseHour(endTimeStr),
-					member: member.member,
-					color: member.color,
-					calendarId: member.calendarId,
-				};
+			const fetchResult = await safeFetch(url, {
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					"Content-Type": "application/json",
+				},
 			});
-			allEvents.push(...memberEvents);
+
+			if (!fetchResult.success) {
+				console.error(
+					`Failed to fetch events for ${member.name} (${calendarId}):`,
+					fetchResult.error,
+				);
+				continue;
+			}
+
+			const response = fetchResult.data;
+			if (!response.ok) {
+				if (response.status === 401) {
+					console.warn(
+						`🔐 Authentication error for ${member.name}. Token may be expired.`,
+					);
+					handleAuthenticationError(calendarId);
+					// 401エラーの場合は即座に処理を終了
+					break;
+				}
+				console.error(
+					`Failed to fetch events for ${member.name} (${calendarId}):`,
+					response.status,
+				);
+				continue;
+			}
+
+			const jsonResult = await safeAsync(
+				() => response.json(),
+				`Failed to parse JSON for ${member.name} (${calendarId})`,
+			);
+
+			if (!jsonResult.success) {
+				console.error(
+					`JSON parse error for ${member.name} (${calendarId}):`,
+					jsonResult.error,
+				);
+				continue;
+			}
+
+			const data = jsonResult.data;
+			console.log(
+				`📊 Found ${data.items?.length || 0} events for ${member.name} (${calendarId})`,
+			);
+
+			if (data.items) {
+				const memberEvents = data.items.map(
+					(event: Record<string, unknown>) => {
+						const start = event.start as
+							| { dateTime?: string; date?: string }
+							| undefined;
+						const end = event.end as
+							| { dateTime?: string; date?: string }
+							| undefined;
+						const startTimeStr = start?.dateTime || start?.date || "";
+						const endTimeStr = end?.dateTime || end?.date || "";
+
+						return {
+							id: event.id as string,
+							title: (event.summary as string) || "(タイトルなし)",
+							startTime: startTimeStr,
+							endTime: endTimeStr,
+							startHour: parseHour(startTimeStr),
+							endHour: parseHour(endTimeStr),
+							member: member.member,
+							color: member.color,
+							calendarId: calendarId,
+						};
+					},
+				);
+				allEvents.push(...memberEvents);
+			}
 		}
 	}
 

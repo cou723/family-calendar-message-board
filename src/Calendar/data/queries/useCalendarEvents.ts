@@ -38,7 +38,7 @@ export const useCalendarEvents = ({
 				member: config.member,
 				name: config.name,
 				color: config.color,
-				calendarId: config.calendarId, // 単一のカレンダーIDを使用
+				calendarIds: config.calendarIds, // 複数のカレンダーIDを使用
 			}));
 
 			// 関数型アプローチでイベントを取得

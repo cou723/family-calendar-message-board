@@ -4,7 +4,7 @@ import {
 	ColorInput,
 	ColorSwatch,
 	Group,
-	Select,
+	MultiSelect,
 	Stack,
 	Text,
 	TextInput,
@@ -28,7 +28,7 @@ export const CalendarSelector = ({
 	isLoading = false,
 }: CalendarSelectorProps) => {
 	const [name, setName] = useState(calendar.name);
-	const [calendarId, setCalendarId] = useState(calendar.calendarId);
+	const [calendarIds, setCalendarIds] = useState(calendar.calendarIds);
 	const [color, setColor] = useState(calendar.color);
 	const { data: calendars, isLoading: isCalendarsLoading } = useCalendarList();
 
@@ -36,7 +36,7 @@ export const CalendarSelector = ({
 		onSave({
 			...calendar,
 			name,
-			calendarId,
+			calendarIds,
 			color,
 		});
 	};
@@ -69,14 +69,18 @@ export const CalendarSelector = ({
 				size="md"
 			/>
 
-			<Select
+			<MultiSelect
 				label="カレンダー"
-				value={calendarId}
-				onChange={(value) => setCalendarId(value || "")}
+				value={calendarIds}
+				onChange={setCalendarIds}
 				data={calendarOptions}
-				placeholder="カレンダーを選択してください"
+				placeholder={
+					isCalendarsLoading ? "読み込み中..." : "カレンダーを選択してください"
+				}
 				disabled={isLoading || isCalendarsLoading}
 				size="md"
+				searchable
+				clearable
 			/>
 
 			<Box>
@@ -111,7 +115,7 @@ export const CalendarSelector = ({
 				<Button
 					leftSection={<Check size={16} />}
 					onClick={handleSave}
-					disabled={isLoading || !name.trim() || !calendarId}
+					disabled={isLoading || !name.trim() || calendarIds.length === 0}
 					size="md"
 				>
 					保存

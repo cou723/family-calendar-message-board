@@ -28,7 +28,7 @@ export const CalendarSettingsTab = ({
 			<Stack gap="md">
 				<Title order={3}>家族カレンダーの設定</Title>
 				<Text size="sm" c="dimmed">
-					表示する家族メンバーのカレンダーを選択してください。
+					表示する家族メンバーとそれぞれのカレンダーを選択してください。1人につき複数のカレンダーを選択できます。
 				</Text>
 			</Stack>
 
@@ -40,10 +40,13 @@ export const CalendarSettingsTab = ({
 
 			<Stack gap="xs">
 				<Text size="xs" c="dimmed">
-					• 最大4人分のカレンダーを表示できます
+					• 最大4人分のメンバーを表示できます
 				</Text>
 				<Text size="xs" c="dimmed">
-					• カレンダーの順序は表示順序に影響します
+					• 1人につき複数のカレンダーを選択できます
+				</Text>
+				<Text size="xs" c="dimmed">
+					• メンバーの順序は表示順序に影響します
 				</Text>
 				<Text size="xs" c="dimmed">
 					• 変更は自動的に保存されます
