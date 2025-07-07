@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useGoogleAuth } from "../../auth/useGoogleAuth";
+import { useAuth } from "../../contexts/AuthContext";
 import type { GoogleCalendarInfo } from "../shared/types";
 import { getAvailableCalendars } from "./calendarDataProvider";
 
@@ -23,13 +23,13 @@ const fetchCalendarList = async (
 };
 
 export const useCalendarList = () => {
-	const { user } = useGoogleAuth();
+	const { user, isAuthenticated } = useAuth();
 
 	return useQuery({
 		queryKey: ["calendarList", user?.access_token],
 		queryFn: () => fetchCalendarList(user?.access_token || ""),
 		staleTime: 5 * 60 * 1000, // 5分間はキャッシュを使用
 		retry: 2,
-		enabled: !!user?.access_token,
+		enabled: isAuthenticated && !!user?.access_token,
 	});
 };

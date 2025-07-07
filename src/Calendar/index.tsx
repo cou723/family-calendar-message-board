@@ -8,8 +8,8 @@ export const Calendar = () => {
 	return (
 		<DateNavigationProvider>
 			<TouchNavigationWrapper>
-				<CalendarHeader />
 				<CalendarGrid />
+				<CalendarHeader />
 				<TodayButton />
 			</TouchNavigationWrapper>
 		</DateNavigationProvider>

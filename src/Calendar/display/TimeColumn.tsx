@@ -25,7 +25,6 @@ export const TimeColumn = ({ cellLayout }: TimeColumnProps) => {
 			w={56}
 			style={{
 				backgroundColor: "#eff6ff", // blue-50
-				borderRight: "2px solid #bfdbfe", // blue-200
 				flexShrink: 0,
 			}}
 		>
@@ -34,15 +33,12 @@ export const TimeColumn = ({ cellLayout }: TimeColumnProps) => {
 				style={{
 					height: `${headerHeight}px`,
 					backgroundColor: "#dbeafe", // blue-100
-					borderBottom: "2px solid #bfdbfe", // blue-200
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "center",
 				}}
 			>
-				<Text fw={700} size="lg" c="#1e3a8a">
-					時間
-				</Text>
+				<Text fw={700} size="lg" c="#1e3a8a"></Text>
 			</Box>
 			<Box>
 				{Array.from(
@@ -60,7 +56,6 @@ export const TimeColumn = ({ cellLayout }: TimeColumnProps) => {
 							ta="center"
 							style={{
 								height: `${cellHeight}px`,
-								borderBottom: "1px solid #bfdbfe", // blue-200
 								display: "flex",
 								alignItems: "center",
 								justifyContent: "center",

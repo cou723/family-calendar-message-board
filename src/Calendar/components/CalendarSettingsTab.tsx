@@ -1,4 +1,5 @@
 import { Stack, Text, Title } from "@mantine/core";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { FamilyCalendarConfig } from "../shared/types";
 import { MultipleCalendarSelector } from "./MultipleCalendarSelector";
@@ -13,11 +14,22 @@ export const CalendarSettingsTab = ({
 	onUpdateCalendars,
 }: CalendarSettingsTabProps) => {
 	const [isLoading, setIsLoading] = useState(false);
+	const queryClient = useQueryClient();
 
 	const handleUpdateCalendars = async (calendars: FamilyCalendarConfig[]) => {
 		setIsLoading(true);
 		try {
 			await onUpdateCalendars(calendars);
+
+			// カレンダー設定変更時にクエリキャッシュを無効化
+			await queryClient.invalidateQueries({
+				queryKey: ["calendarEvents"],
+			});
+
+			// 更なる確実性のためにカレンダーイベントをリフェッチ
+			await queryClient.refetchQueries({
+				queryKey: ["calendarEvents"],
+			});
 		} finally {
 			setIsLoading(false);
 		}

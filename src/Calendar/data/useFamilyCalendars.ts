@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { array, object, parse, string } from "valibot";
 import { SafeStorage, safeJsonParse, safeSync } from "../shared/safeStorage";
@@ -84,6 +85,7 @@ export const useFamilyCalendars = () => {
 	const [familyCalendars, setFamilyCalendars] = useState<
 		FamilyCalendarConfig[]
 	>(loadFamilyCalendarsFromStorage);
+	const queryClient = useQueryClient();
 
 	/**
 	 * 家族カレンダー設定を更新
@@ -101,6 +103,16 @@ export const useFamilyCalendars = () => {
 		if (!result.success) {
 			console.error("ローカルストレージへの設定保存エラー:", result.error);
 		}
+
+		// 家族カレンダー設定変更時にクエリキャッシュを無効化
+		queryClient.invalidateQueries({
+			queryKey: ["calendarEvents"],
+		});
+
+		// 更なる確実性のためにカレンダーイベントをリフェッチ
+		queryClient.refetchQueries({
+			queryKey: ["calendarEvents"],
+		});
 	};
 
 	return {

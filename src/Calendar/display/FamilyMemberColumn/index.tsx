@@ -38,7 +38,6 @@ export const FamilyMemberColumn = ({
 			flex={1}
 			style={{
 				minWidth: 0,
-				borderRight: "1px solid #bfdbfe", // blue-200
 				position: "relative",
 			}}
 		>
@@ -48,7 +47,6 @@ export const FamilyMemberColumn = ({
 				style={{
 					height: `${headerHeight}px`,
 					backgroundColor: color,
-					borderBottom: "2px solid #bfdbfe", // blue-200
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "center",
@@ -74,7 +72,6 @@ export const FamilyMemberColumn = ({
 							key={`bg-${member}-${hour}`}
 							style={{
 								height: `${cellHeight}px`,
-								borderBottom: "1px solid #bfdbfe", // blue-200
 								...backgroundStyle,
 							}}
 						/>

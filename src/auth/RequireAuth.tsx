@@ -1,14 +1,14 @@
 import { Center, Group, Loader, Paper, Text } from "@mantine/core";
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useGoogleAuth } from "./useGoogleAuth";
+import { useAuth } from "../contexts/AuthContext";
 
 interface RequireAuthProps {
 	children: ReactNode;
 }
 
 export const RequireAuth = ({ children }: RequireAuthProps) => {
-	const { isAuthenticated, loading } = useGoogleAuth();
+	const { isAuthenticated, loading } = useAuth();
 	const location = useLocation();
 
 	if (loading) {

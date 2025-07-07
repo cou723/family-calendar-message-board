@@ -20,7 +20,6 @@ export const EventsLoadingPlaceholder = ({
 					flex={1}
 					style={{
 						minWidth: 0,
-						borderRight: "1px solid #bfdbfe", // blue-200
 						position: "relative",
 					}}
 				>
@@ -30,7 +29,6 @@ export const EventsLoadingPlaceholder = ({
 						style={{
 							height: `${headerHeight}px`,
 							backgroundColor: familyMember.color,
-							borderBottom: "2px solid #bfdbfe", // blue-200
 							display: "flex",
 							alignItems: "center",
 							justifyContent: "center",
@@ -51,7 +49,6 @@ export const EventsLoadingPlaceholder = ({
 								key={`bg-loading-${familyMember.member}-${hour}`}
 								style={{
 									height: `${cellHeight}px`,
-									borderBottom: "1px solid #bfdbfe", // blue-200
 								}}
 							/>
 						))}

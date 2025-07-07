@@ -16,12 +16,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CalendarSettingsTab } from "../Calendar/components/CalendarSettingsTab";
 import { useSettings } from "../Calendar/shared/useSettings";
+import { useAuth } from "../contexts/AuthContext";
 
 export const SettingsPage = () => {
 	const navigate = useNavigate();
-	const [activeTab, setActiveTab] = useState<"time" | "calendar">("time");
+	const [activeTab, setActiveTab] = useState<"time" | "calendar" | "account">(
+		"time",
+	);
 	const { timeRange, settingsControl, familyCalendars, setFamilyCalendars } =
 		useSettings();
+	const { user, logout } = useAuth();
 
 	// 時間範囲変更時の処理
 	const handleTimeRangeChange = (value: [number, number]) => {
@@ -51,7 +55,9 @@ export const SettingsPage = () => {
 			<Paper shadow="sm" radius="md" withBorder>
 				<Tabs
 					value={activeTab}
-					onChange={(value) => setActiveTab(value as "time" | "calendar")}
+					onChange={(value) =>
+						setActiveTab(value as "time" | "calendar" | "account")
+					}
 				>
 					<Tabs.List>
 						<Tabs.Tab value="time" fw={500} size="lg">
@@ -59,6 +65,9 @@ export const SettingsPage = () => {
 						</Tabs.Tab>
 						<Tabs.Tab value="calendar" fw={500} size="lg">
 							カレンダー
+						</Tabs.Tab>
+						<Tabs.Tab value="account" fw={500} size="lg">
+							アカウント
 						</Tabs.Tab>
 					</Tabs.List>
 
@@ -111,6 +120,48 @@ export const SettingsPage = () => {
 								familyCalendars={familyCalendars}
 								onUpdateCalendars={setFamilyCalendars}
 							/>
+						</Tabs.Panel>
+
+						<Tabs.Panel value="account">
+							<Stack gap="xl">
+								<Box>
+									<Text size="lg" fw={500} mb="md">
+										ログイン中のアカウント
+									</Text>
+									{user && (
+										<Paper withBorder p="md" radius="md" bg="gray.0">
+											<Stack gap="xs">
+												<Text size="md" fw={500}>
+													{user.name}
+												</Text>
+												<Text size="sm" c="dimmed">
+													{user.email}
+												</Text>
+											</Stack>
+										</Paper>
+									)}
+								</Box>
+
+								<Box>
+									<Text size="lg" fw={500} mb="md">
+										アカウント操作
+									</Text>
+									<Button
+										color="red"
+										variant="outline"
+										size="lg"
+										onClick={logout}
+									>
+										ログアウト
+									</Button>
+								</Box>
+
+								<Alert variant="light" color="orange" radius="md">
+									<Text size="sm">
+										ログアウトするとアプリケーションが再起動され、再度ログインが必要になります。
+									</Text>
+								</Alert>
+							</Stack>
 						</Tabs.Panel>
 					</Box>
 				</Tabs>

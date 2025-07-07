@@ -9,10 +9,10 @@ import {
 } from "@mantine/core";
 import { useGoogleLogin } from "@react-oauth/google";
 import { Navigate, useLocation } from "react-router-dom";
-import { useGoogleAuth } from "./useGoogleAuth";
+import { useAuth } from "../contexts/AuthContext";
 
 export const LoginPage = () => {
-	const { isAuthenticated, login } = useGoogleAuth();
+	const { isAuthenticated, login } = useAuth();
 	const location = useLocation();
 
 	// カレンダーアクセス用のログイン（アクセストークンを取得）
@@ -36,6 +36,7 @@ export const LoginPage = () => {
 		},
 		scope: "https://www.googleapis.com/auth/calendar.readonly",
 		state: crypto.randomUUID(), // CSRF保護のためのstateパラメータ
+		flow: "implicit", // ポップアップフローを明示的に指定
 	});
 
 	// 認証済みの場合は元のページにリダイレクト

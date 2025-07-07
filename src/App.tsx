@@ -37,29 +37,31 @@ function App() {
 	return (
 		<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
 			<MantineProvider theme={theme}>
-				<SettingsProvider>
-					<BrowserRouter>
-						<Routes>
-							<Route path="/login" element={<LoginPage />} />
-							<Route
-								path="/"
-								element={
-									<RequireAuth>
+				<BrowserRouter>
+					<Routes>
+						<Route path="/login" element={<LoginPage />} />
+						<Route
+							path="/"
+							element={
+								<RequireAuth>
+									<SettingsProvider>
 										<CalendarPage />
-									</RequireAuth>
-								}
-							/>
-							<Route
-								path="/settings"
-								element={
-									<RequireAuth>
+									</SettingsProvider>
+								</RequireAuth>
+							}
+						/>
+						<Route
+							path="/settings"
+							element={
+								<RequireAuth>
+									<SettingsProvider>
 										<SettingsPage />
-									</RequireAuth>
-								}
-							/>
-						</Routes>
-					</BrowserRouter>
-				</SettingsProvider>
+									</SettingsProvider>
+								</RequireAuth>
+							}
+						/>
+					</Routes>
+				</BrowserRouter>
 			</MantineProvider>
 		</GoogleOAuthProvider>
 	);
