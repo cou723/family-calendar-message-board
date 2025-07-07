@@ -1,4 +1,5 @@
 import { createContext, type ReactNode, useContext, useState } from "react";
+import { useFamilyCalendars } from "../data/useFamilyCalendars";
 import type { FamilyCalendarConfig } from "../shared/types";
 
 interface SettingsContextType {
@@ -24,38 +25,9 @@ interface SettingsProviderProps {
 export const SettingsProvider = ({ children }: SettingsProviderProps) => {
 	const [startHour, setStartHour] = useState(6);
 	const [endHour, setEndHour] = useState(23);
-	const [familyCalendars, setFamilyCalendars] = useState<
-		FamilyCalendarConfig[]
-	>([
-		{
-			id: "1",
-			member: "person1",
-			name: "人A",
-			color: "#1d4ed8",
-			calendarIds: [],
-		},
-		{
-			id: "2",
-			member: "person2",
-			name: "人B",
-			color: "#dc2626",
-			calendarIds: [],
-		},
-		{
-			id: "3",
-			member: "person3",
-			name: "人C",
-			color: "#059669",
-			calendarIds: [],
-		},
-		{
-			id: "4",
-			member: "person4",
-			name: "人D",
-			color: "#d97706",
-			calendarIds: [],
-		},
-	]);
+
+	// useFamilyCalendarsを使用してLocalStorageと同期
+	const { familyCalendars, updateFamilyCalendars } = useFamilyCalendars();
 
 	const setTimeRange = (range: [number, number]) => {
 		setStartHour(range[0]);
@@ -73,7 +45,7 @@ export const SettingsProvider = ({ children }: SettingsProviderProps) => {
 			setTimeRange,
 		},
 		familyCalendars,
-		setFamilyCalendars,
+		setFamilyCalendars: updateFamilyCalendars,
 	};
 
 	return (
