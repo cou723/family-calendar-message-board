@@ -132,9 +132,153 @@ export function safeJwtDecode<T = unknown>(token: string): Result<T, string> {
 	}, "JWT decode failed");
 }
 
+/**
+ * Web Crypto APIを使用した暗号化キーの生成
+ */
+async function generateEncryptionKey(): Promise<CryptoKey> {
+	return await crypto.subtle.generateKey(
+		{
+			name: "AES-GCM",
+			length: 256,
+		},
+		true,
+		["encrypt", "decrypt"],
+	);
+}
+
+/**
+ * キーをlocalStorageから取得または新規生成
+ */
+async function getOrCreateEncryptionKey(): Promise<CryptoKey> {
+	const keyResult = getItem("encryption-key");
+
+	if (keyResult.success && keyResult.data) {
+		try {
+			const keyData = JSON.parse(keyResult.data);
+			return await crypto.subtle.importKey(
+				"jwk",
+				keyData,
+				{ name: "AES-GCM" },
+				true,
+				["encrypt", "decrypt"],
+			);
+		} catch (error) {
+			console.warn("Failed to import stored key, generating new one:", error);
+		}
+	}
+
+	// 新しいキーを生成して保存
+	const key = await generateEncryptionKey();
+	const exportedKey = await crypto.subtle.exportKey("jwk", key);
+	setItem("encryption-key", JSON.stringify(exportedKey));
+
+	return key;
+}
+
+/**
+ * データを暗号化
+ */
+async function encryptData(data: string): Promise<Result<string, string>> {
+	try {
+		const key = await getOrCreateEncryptionKey();
+		const encoder = new TextEncoder();
+		const dataBuffer = encoder.encode(data);
+
+		const iv = crypto.getRandomValues(new Uint8Array(12));
+		const encryptedBuffer = await crypto.subtle.encrypt(
+			{ name: "AES-GCM", iv },
+			key,
+			dataBuffer,
+		);
+
+		// IVと暗号化データを結合してbase64エンコード
+		const combined = new Uint8Array(iv.length + encryptedBuffer.byteLength);
+		combined.set(iv);
+		combined.set(new Uint8Array(encryptedBuffer), iv.length);
+
+		return Ok(btoa(String.fromCharCode(...combined)));
+	} catch (error) {
+		return Err(
+			`Encryption failed: ${error instanceof Error ? error.message : String(error)}`,
+		);
+	}
+}
+
+/**
+ * データを復号化
+ */
+async function decryptData(
+	encryptedData: string,
+): Promise<Result<string, string>> {
+	try {
+		const key = await getOrCreateEncryptionKey();
+		const combined = new Uint8Array(
+			atob(encryptedData)
+				.split("")
+				.map((char) => char.charCodeAt(0)),
+		);
+
+		const iv = combined.slice(0, 12);
+		const encrypted = combined.slice(12);
+
+		const decryptedBuffer = await crypto.subtle.decrypt(
+			{ name: "AES-GCM", iv },
+			key,
+			encrypted,
+		);
+
+		const decoder = new TextDecoder();
+		return Ok(decoder.decode(decryptedBuffer));
+	} catch (error) {
+		return Err(
+			`Decryption failed: ${error instanceof Error ? error.message : String(error)}`,
+		);
+	}
+}
+
+/**
+ * 暗号化してlocalStorageに保存
+ */
+export async function setItemEncrypted(
+	key: string,
+	value: string,
+): Promise<Result<void, string>> {
+	const encryptResult = await encryptData(value);
+	if (!encryptResult.success) {
+		return encryptResult;
+	}
+
+	return setItem(key, encryptResult.data);
+}
+
+/**
+ * localStorageから取得して復号化
+ */
+export async function getItemEncrypted(
+	key: string,
+): Promise<Result<string | null, string>> {
+	const getResult = getItem(key);
+	if (!getResult.success) {
+		return getResult;
+	}
+
+	if (!getResult.data) {
+		return Ok(null);
+	}
+
+	const decryptResult = await decryptData(getResult.data);
+	if (!decryptResult.success) {
+		return decryptResult;
+	}
+
+	return Ok(decryptResult.data);
+}
+
 // 安全なlocalStorageラッパー
 export const SafeStorage = {
 	getItem,
 	setItem,
 	removeItem,
+	setItemEncrypted,
+	getItemEncrypted,
 };

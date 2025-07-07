@@ -12,60 +12,75 @@ export const useGoogleAuth = () => {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		// ページ読み込み時にlocalStorageから状態を復元
-		const tokenResult = SafeStorage.getItem("google-access-token");
-		const emailResult = SafeStorage.getItem("google-user-email");
-		const nameResult = SafeStorage.getItem("google-user-name");
+		// ページ読み込み時にlocalStorageから暗号化された状態を復元
+		const restoreUserData = async () => {
+			const tokenResult = await SafeStorage.getItemEncrypted(
+				"google-access-token",
+			);
+			const emailResult =
+				await SafeStorage.getItemEncrypted("google-user-email");
+			const nameResult = await SafeStorage.getItemEncrypted("google-user-name");
 
-		// アクセストークンがあれば認証済みとして扱う
-		if (tokenResult.success && tokenResult.data) {
-			setUser({
-				access_token: tokenResult.data,
-				email:
-					emailResult.success && emailResult.data
-						? emailResult.data
-						: "unknown@example.com",
-				name:
-					nameResult.success && nameResult.data ? nameResult.data : "ユーザー",
-			});
-		} else {
-			// トークンがない、または取得に失敗した場合のログ出力
-			if (!tokenResult.success)
-				console.warn("トークン取得失敗:", tokenResult.error);
-			if (!emailResult.success)
-				console.warn("メール取得失敗:", emailResult.error);
-			if (!nameResult.success) console.warn("名前取得失敗:", nameResult.error);
-		}
-		setLoading(false);
+			// アクセストークンがあれば認証済みとして扱う
+			if (tokenResult.success && tokenResult.data) {
+				setUser({
+					access_token: tokenResult.data,
+					email:
+						emailResult.success && emailResult.data
+							? emailResult.data
+							: "unknown@example.com",
+					name:
+						nameResult.success && nameResult.data
+							? nameResult.data
+							: "ユーザー",
+				});
+			} else {
+				// トークンがない、または取得に失敗した場合のログ出力
+				if (!tokenResult.success)
+					console.warn("暗号化トークン取得失敗:", tokenResult.error);
+				if (!emailResult.success)
+					console.warn("暗号化メール取得失敗:", emailResult.error);
+				if (!nameResult.success)
+					console.warn("暗号化名前取得失敗:", nameResult.error);
+			}
+			setLoading(false);
+		};
+
+		restoreUserData();
 	}, []);
 
-	const login = (userData: GoogleUser) => {
-		// ユーザーデータをlocalStorageに保存
-		const tokenResult = SafeStorage.setItem(
+	const login = async (userData: GoogleUser) => {
+		// ユーザーデータを暗号化してlocalStorageに保存
+		const tokenResult = await SafeStorage.setItemEncrypted(
 			"google-access-token",
 			userData.access_token,
 		);
-		const emailResult = SafeStorage.setItem(
+		const emailResult = await SafeStorage.setItemEncrypted(
 			"google-user-email",
 			userData.email,
 		);
-		const nameResult = SafeStorage.setItem("google-user-name", userData.name);
+		const nameResult = await SafeStorage.setItemEncrypted(
+			"google-user-name",
+			userData.name,
+		);
 
 		// 保存エラーの確認
 		if (!tokenResult.success)
-			console.error("トークン保存失敗:", tokenResult.error);
+			console.error("暗号化トークン保存失敗:", tokenResult.error);
 		if (!emailResult.success)
-			console.error("メール保存失敗:", emailResult.error);
-		if (!nameResult.success) console.error("名前保存失敗:", nameResult.error);
+			console.error("暗号化メール保存失敗:", emailResult.error);
+		if (!nameResult.success)
+			console.error("暗号化名前保存失敗:", nameResult.error);
 
 		setUser(userData);
 	};
 
 	const logout = () => {
-		// localStorageをクリア
+		// localStorageをクリア（暗号化キーも削除）
 		const tokenResult = SafeStorage.removeItem("google-access-token");
 		const emailResult = SafeStorage.removeItem("google-user-email");
 		const nameResult = SafeStorage.removeItem("google-user-name");
+		const keyResult = SafeStorage.removeItem("encryption-key");
 
 		// 削除エラーの確認
 		if (!tokenResult.success)
@@ -73,6 +88,8 @@ export const useGoogleAuth = () => {
 		if (!emailResult.success)
 			console.error("メール削除失敗:", emailResult.error);
 		if (!nameResult.success) console.error("名前削除失敗:", nameResult.error);
+		if (!keyResult.success)
+			console.error("暗号化キー削除失敗:", keyResult.error);
 
 		setUser(null);
 		window.location.reload(); // 状態をリセット

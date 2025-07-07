@@ -22,7 +22,7 @@ export const LoginPage = () => {
 				const { fetchGoogleUserInfo } = await import("./googleAuthApi");
 				const userInfo = await fetchGoogleUserInfo(tokenResponse.access_token);
 
-				login({
+				await login({
 					access_token: tokenResponse.access_token,
 					email: userInfo.email,
 					name: userInfo.name,
@@ -35,6 +35,7 @@ export const LoginPage = () => {
 			console.error("Google Calendar Login Failed:", error);
 		},
 		scope: "https://www.googleapis.com/auth/calendar.readonly",
+		state: crypto.randomUUID(), // CSRF保護のためのstateパラメータ
 	});
 
 	// 認証済みの場合は元のページにリダイレクト
