@@ -1,26 +1,20 @@
 # 家族カレンダー掲示板
 
-タブレット表示用の家族向けカレンダーアプリケーション。セキュアなサーバーサイド認証とGoogleカレンダー連携を特徴とする。
+タブレット表示用の家族向けカレンダーアプリケーション。フロントエンドオンリーの構成でGoogleカレンダー連携を実現。
 
 ## 🚀 デプロイ構成
 
 ### フロントエンド（Vercel）
 - **URL**: `https://family-calendar-message-board.vercel.app`
-- **技術**: Vite + React + TypeScript + TailwindCSS
+- **技術**: Vite + React + TypeScript + Mantine UI
 - **自動デプロイ**: main ブランチプッシュ時
-
-### バックエンド（Deno Deploy）
-- **URL**: `https://family-calendar-api.deno.dev`
-- **技術**: Deno + TypeScript
-- **役割**: 認証プロキシ + セッション管理
 
 ## 🔐 セキュリティ機能
 
-- ✅ OAuth 2.0 PKCE フローによる安全な認証
-- ✅ httpOnlyクッキーによるセッション管理
+- ✅ OAuth 2.0認証フローによる安全な認証
 - ✅ CSRF保護 (state parameter)
-- ✅ XSS攻撃からの完全保護
-- ✅ セッションタイムアウト（24時間）
+- ✅ トークンの暗号化保存（AES-GCM 256bit）
+- ✅ XSS攻撃によるトークン窃取防止
 - ✅ セキュリティヘッダー設定
 
 ## 🛠️ 開発環境セットアップ
@@ -32,88 +26,59 @@ git clone https://github.com/your-username/family-calendar-message-board.git
 cd family-calendar-message-board
 ```
 
-### 2. フロントエンド開発
+### 2. 依存関係インストール
 
 ```bash
-# 依存関係インストール
 pnpm install
-
-# 環境変数設定
-cp .env.example .env
-# .envファイルを編集してAPIサーバーURLを設定
-
-# 開発サーバー起動
-pnpm run dev
 ```
 
-### 3. バックエンド開発
+### 3. 環境変数設定
+
+Google Cloud Consoleで取得したOAuth認証情報を設定:
 
 ```bash
-cd deno-backend
+# .env.localファイルを作成
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+```
 
-# 環境変数設定
-cp .env.example .env
-# .envファイルにGoogle OAuth認証情報を設定
+### 4. 開発サーバー起動
 
-# 開発サーバー起動
-deno task dev
+```bash
+pnpm run dev
 ```
 
 ## 📦 デプロイ手順
 
-### フロントエンド（Vercel）
+### Vercel連携
 
-1. **Vercel連携**
+1. **Vercel設定**
    - [Vercel](https://vercel.com/)でGitHubリポジトリをインポート
    - プロジェクト名を `family-calendar-message-board` に設定
-   - カスタムドメイン設定で `family-calendar-message-board.vercel.app` を使用
 
 2. **環境変数設定**
    ```
-   VITE_API_BASE_URL=https://family-calendar-api.deno.dev
+   VITE_GOOGLE_CLIENT_ID=your_google_client_id
    ```
 
 3. **自動デプロイ**
    - main ブランチへのプッシュで自動デプロイ
 
-### バックエンド（Deno Deploy）
-
-1. **Deno Deploy設定**
-   - [Deno Deploy](https://dash.deno.com/)でプロジェクト作成
-   - プロジェクト名: `family-calendar-api`
-   - GitHubリポジトリ連携
-   - エントリーポイント: `deno-backend/main.ts`
-
-2. **環境変数設定**
-   ```
-   GOOGLE_CLIENT_ID=your_google_client_id
-   GOOGLE_CLIENT_SECRET=your_google_client_secret
-   BASE_URL=https://family-calendar-api.deno.dev
-   DENO_ENV=production
-   ```
-
-3. **Google Cloud Console設定**
-   - OAuth 2.0 クライアントの承認済みリダイレクトURIに追加:
-     ```
-     https://family-calendar-api.deno.dev/api/auth/callback
-     ```
-
 ## 🏗️ アーキテクチャ
 
 ```
-┌─────────────────────┐    ┌─────────────────────┐    ┌─────────────────┐
-│   Vercel            │    │  Deno Deploy        │    │  Google APIs    │
-│   (Frontend)        │◄──►│  (Auth Proxy)       │◄──►│  (Calendar API) │
-│                     │    │                     │    │                 │
-│ - React + Vite      │    │ - OAuth 2.0 PKCE    │    │ - Calendar API  │
-│ - TailwindCSS       │    │ - Session管理        │    │ - 読み取り専用   │
-│ - TypeScript        │    │ - CSRF保護          │    │                 │
-└─────────────────────┘    └─────────────────────┘    └─────────────────┘
+┌─────────────────────┐    ┌─────────────────┐
+│   Vercel            │    │  Google APIs    │
+│   (Frontend)        │◄──►│  (Calendar API) │
+│                     │    │                 │
+│ - React + Vite      │    │ - Calendar API  │
+│ - Mantine UI        │    │ - 読み取り専用   │
+│ - TypeScript        │    │                 │
+│ - 暗号化トークン保存 │    │                 │
+└─────────────────────┘    └─────────────────┘
 ```
 
 ## 💻 開発コマンド
 
-### フロントエンド
 ```bash
 pnpm run dev          # 開発サーバー起動
 pnpm run build        # プロダクションビルド
@@ -122,20 +87,15 @@ pnpm run typecheck    # TypeScript型チェック
 pnpm run lint         # コードリント
 pnpm run lint:fix     # リント自動修正
 pnpm run test         # テスト実行
-```
-
-### バックエンド
-```bash
-deno task dev         # 開発サーバー起動
-deno task start       # プロダクションサーバー起動
+pnpm run test:ui      # テストUIモード
 ```
 
 ## 🔧 設定ファイル
 
 - `vercel.json` - Vercelデプロイ設定
-- `deno-backend/deno.json` - Deno設定
-- `.env.example` - 環境変数テンプレート
-- `.env.production` - プロダクション環境設定
+- `vite.config.ts` - Viteビルド設定
+- `biome.json` - コード品質設定
+- `tsconfig.json` - TypeScript設定
 
 ## 📱 機能
 
@@ -156,15 +116,14 @@ deno task start       # プロダクションサーバー起動
 ## 🔒 セキュリティ対策
 
 ### 実装済み対策
-- トークンのサーバーサイド管理
-- httpOnlyクッキーによるセッション保護
-- CSRF攻撃防止
-- XSS攻撃対策
-- セキュリティヘッダー設定
+- **トークンの暗号化保存**: AES-GCM 256bitでlocalStorageに暗号化保存
+- **CSRF攻撃防止**: stateパラメータによる保護
+- **XSS攻撃対策**: 暗号化によるトークン窃取防止
+- **セキュリティヘッダー設定**: Vercelでのセキュリティヘッダー
 
 ### 監査レポート
 - `SECURITY_AUDIT_REPORT.md` - セキュリティ監査結果
-- 家族向けアプリケーションとして十分なセキュリティレベルを達成
+- **高リスク脆弱性を完全解決**: 家族向けアプリケーションとして安全な運用レベルを達成
 
 ## 📄 ライセンス
 

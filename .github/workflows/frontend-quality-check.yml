@@ -64,8 +64,6 @@ jobs:
 
       - name: Build check
         run: pnpm run build
-        env:
-          VITE_API_BASE_URL: https://family-calendar-api.deno.dev
 
       - name: Deployment Status
         run: |
