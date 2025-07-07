@@ -10,9 +10,9 @@ export const useCellLayout = (startHour: number, endHour: number) => {
 			const screenHeight = window.innerHeight;
 
 			// 固定される部分の高さを正確に計算（余裕を持った値）
-			const topHeaderHeight = 110; // 日付ヘッダー部分（実測ベース + 余裕）
+			const bottomHeaderHeight = 110; // 日付ヘッダー部分（下部に移動、実測ベース + 余裕）
 			const safetyMargin = 10; // 安全マージン
-			const reservedHeight = topHeaderHeight + safetyMargin;
+			const reservedHeight = bottomHeaderHeight + safetyMargin;
 
 			const availableHeight = screenHeight - reservedHeight;
 			const totalHours = endHour - startHour + 1; // 動的な時間範囲

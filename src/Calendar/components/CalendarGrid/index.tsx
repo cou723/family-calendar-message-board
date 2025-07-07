@@ -1,4 +1,4 @@
-import { Box, ScrollArea } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { useCalendarEvents } from "../../data/queries/useCalendarEvents";
 import { EventsLoadingPlaceholder } from "../../display/EventsLoadingPlaceholder";
 import { FamilyMemberColumn } from "../../display/FamilyMemberColumn";
@@ -36,36 +36,34 @@ export const CalendarGrid = () => {
 	}));
 
 	return (
-		<Box flex={1} style={{ overflow: "hidden", minHeight: 0 }}>
-			<ScrollArea h="100%" w="100%">
-				<Box
-					style={{
-						display: "flex",
-						background: "white",
-						minWidth: "max-content",
-					}}
-				>
-					{/* 時間軸 */}
-					<TimeColumn cellLayout={cell} />
+		<Box
+			flex={1}
+			style={{
+				overflow: "auto",
+				minHeight: 0,
+				display: "flex",
+				background: "white",
+			}}
+		>
+			{/* 時間軸 */}
+			<TimeColumn cellLayout={cell} />
 
-					{/* 家族メンバーカラム（ローディング時は専用表示） */}
-					{isLoadingEvents ? (
-						<EventsLoadingPlaceholder
-							cellLayout={cell}
-							familyMembers={familyMembers}
-						/>
-					) : (
-						familyMembers.map((familyMember) => (
-							<FamilyMemberColumn
-								key={familyMember.member}
-								familyMember={familyMember}
-								cellLayout={cell}
-								events={events || []}
-							/>
-						))
-					)}
-				</Box>
-			</ScrollArea>
+			{/* 家族メンバーカラム（ローディング時は専用表示） */}
+			{isLoadingEvents ? (
+				<EventsLoadingPlaceholder
+					cellLayout={cell}
+					familyMembers={familyMembers}
+				/>
+			) : (
+				familyMembers.map((familyMember) => (
+					<FamilyMemberColumn
+						key={familyMember.member}
+						familyMember={familyMember}
+						cellLayout={cell}
+						events={events || []}
+					/>
+				))
+			)}
 		</Box>
 	);
 };
