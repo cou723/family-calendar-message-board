@@ -1,19 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { array, object, parse, string } from "valibot";
-import { SafeStorage, safeJsonParse, safeSync } from "../shared/safeStorage";
+import { AppStorage } from "../shared/appStorage";
 import type { FamilyCalendarConfig } from "../shared/types";
-
-// Valibotスキーマでバリデーション
-const FamilyCalendarConfigSchema = object({
-	id: string(),
-	member: string(),
-	calendarIds: array(string()),
-	name: string(),
-	color: string(),
-});
-
-const FamilyCalendarConfigArraySchema = array(FamilyCalendarConfigSchema);
 
 const getDefaultFamilyCalendars = (): FamilyCalendarConfig[] => [
 	{
@@ -47,44 +35,29 @@ const getDefaultFamilyCalendars = (): FamilyCalendarConfig[] => [
 ];
 
 const loadFamilyCalendarsFromStorage = (): FamilyCalendarConfig[] => {
-	const result = SafeStorage.getItem("familyCalendarSettings");
+	const settings = AppStorage.getFamilyCalendarSettings();
 
-	if (!result.success) {
-		console.error("ローカルストレージ読み込みエラー:", result.error);
-		console.warn("デフォルト設定を使用します");
+	if (!settings) {
+		console.warn(
+			"家族カレンダー設定が見つかりません。デフォルト設定を使用します",
+		);
 		return getDefaultFamilyCalendars();
 	}
 
-	if (!result.data) {
-		// データが存在しない場合
-		return getDefaultFamilyCalendars();
-	}
-
-	const parseResult = safeJsonParse(result.data);
-	if (!parseResult.success) {
-		console.error("JSON解析エラー:", parseResult.error);
-		console.warn("デフォルト設定を使用します");
-		return getDefaultFamilyCalendars();
-	}
-
-	const validationResult = safeSync(
-		() => parse(FamilyCalendarConfigArraySchema, parseResult.data),
-		"Valibot validation failed",
-	);
-
-	if (!validationResult.success) {
-		console.error("設定データのバリデーションエラー:", validationResult.error);
-		console.warn("デフォルト設定を使用します");
-		return getDefaultFamilyCalendars();
-	}
-
-	return validationResult.data;
+	return settings.familyCalendars;
 };
 
 export const useFamilyCalendars = () => {
 	const [familyCalendars, setFamilyCalendars] = useState<
 		FamilyCalendarConfig[]
-	>(loadFamilyCalendarsFromStorage);
+	>(() => {
+		try {
+			return loadFamilyCalendarsFromStorage();
+		} catch (error) {
+			console.error("家族カレンダー設定の読み込みエラー:", error);
+			return getDefaultFamilyCalendars();
+		}
+	});
 	const queryClient = useQueryClient();
 
 	/**
@@ -95,13 +68,12 @@ export const useFamilyCalendars = () => {
 	): void => {
 		setFamilyCalendars(newCalendars);
 
-		const result = SafeStorage.setItem(
-			"familyCalendarSettings",
-			JSON.stringify(newCalendars),
-		);
+		const success = AppStorage.setFamilyCalendarSettings({
+			familyCalendars: newCalendars,
+		});
 
-		if (!result.success) {
-			console.error("ローカルストレージへの設定保存エラー:", result.error);
+		if (!success) {
+			console.error("家族カレンダー設定の保存に失敗しました");
 		}
 
 		// 家族カレンダー設定変更時にクエリキャッシュを無効化

@@ -28,12 +28,13 @@ export const CalendarGrid = () => {
 	};
 
 	// familyCalendarsから家族メンバー情報を取得
-	const familyMembers: FamilyMember[] = familyCalendars.map((calendar) => ({
-		member: calendar.member,
-		name: calendar.name,
-		color: calendar.color,
-		calendarIds: calendar.calendarIds,
-	}));
+	const familyMembers: FamilyMember[] =
+		familyCalendars?.map((calendar) => ({
+			member: calendar.member,
+			name: calendar.name,
+			color: calendar.color,
+			calendarIds: calendar.calendarIds,
+		})) || [];
 
 	return (
 		<Box

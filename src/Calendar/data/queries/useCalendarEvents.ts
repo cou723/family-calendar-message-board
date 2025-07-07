@@ -25,7 +25,7 @@ export const useCalendarEvents = ({
 		queryKey: ["calendarEvents", dateKey, familyCalendars],
 		queryFn: async (): Promise<CalendarEvent[]> => {
 			// 認証状態に応じたデータプロバイダーを取得
-			const dataProvider = getCalendarDataProvider();
+			const dataProvider = await getCalendarDataProvider();
 
 			// 認証されていない場合は空配列を返す
 			if (!dataProvider) {

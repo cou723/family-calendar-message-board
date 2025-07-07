@@ -6,9 +6,9 @@ import {
 	useEffect,
 	useState,
 } from "react";
-import { type InferOutput, number, object, parse } from "valibot";
+import { type InferOutput, number, object } from "valibot";
 import { useFamilyCalendars } from "../data/useFamilyCalendars";
-import { SafeStorage, safeJsonParse, safeSync } from "../shared/safeStorage";
+import { AppStorage } from "../shared/appStorage";
 import type { FamilyCalendarConfig } from "../shared/types";
 
 interface SettingsContextType {
@@ -47,50 +47,21 @@ const getDefaultTimeRange = (): TimeRangeConfig => ({
 
 // ローカルストレージから時間範囲設定を読み込み
 const loadTimeRangeFromStorage = (): TimeRangeConfig => {
-	const result = SafeStorage.getItem("timeRangeSettings");
+	const settings = AppStorage.getTimeRangeSettings();
 
-	if (!result.success) {
-		console.error("時間範囲設定の読み込みエラー:", result.error);
-		console.warn("デフォルト時間範囲設定を使用します");
+	if (!settings) {
+		console.warn("時間範囲設定が見つかりません。デフォルト設定を使用します");
 		return getDefaultTimeRange();
 	}
 
-	if (!result.data) {
-		return getDefaultTimeRange();
-	}
-
-	const parseResult = safeJsonParse(result.data);
-	if (!parseResult.success) {
-		console.error("時間範囲設定のJSON解析エラー:", parseResult.error);
-		console.warn("デフォルト時間範囲設定を使用します");
-		return getDefaultTimeRange();
-	}
-
-	const validationResult = safeSync(
-		() => parse(TimeRangeSchema, parseResult.data),
-		"時間範囲設定のバリデーションに失敗しました",
-	);
-
-	if (!validationResult.success) {
-		console.error(
-			"時間範囲設定のバリデーションエラー:",
-			validationResult.error,
-		);
-		console.warn("デフォルト時間範囲設定を使用します");
-		return getDefaultTimeRange();
-	}
-
-	return validationResult.data;
+	return settings;
 };
 
 // ローカルストレージに時間範囲設定を保存
 const saveTimeRangeToStorage = (timeRange: TimeRangeConfig) => {
-	const result = SafeStorage.setItem(
-		"timeRangeSettings",
-		JSON.stringify(timeRange),
-	);
-	if (!result.success) {
-		console.error("時間範囲設定の保存エラー:", result.error);
+	const success = AppStorage.setTimeRangeSettings(timeRange);
+	if (!success) {
+		console.error("時間範囲設定の保存に失敗しました");
 	}
 };
 
@@ -161,7 +132,7 @@ export const SettingsProvider = ({ children }: SettingsProviderProps) => {
 			setEndHour: setEndHourWithCache,
 			setTimeRange,
 		},
-		familyCalendars,
+		familyCalendars: familyCalendars || [],
 		setFamilyCalendars: updateFamilyCalendars,
 	};
 

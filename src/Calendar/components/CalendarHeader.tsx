@@ -1,4 +1,4 @@
-import { ActionIcon, Paper, Title } from "@mantine/core";
+import { ActionIcon, Box, Title } from "@mantine/core";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
@@ -9,36 +9,27 @@ export const CalendarHeader = () => {
 	const navigate = useNavigate();
 
 	return (
-		<Paper
-			shadow="sm"
+		<Box
 			p="md"
 			style={{
 				flexShrink: 0,
 				position: "relative",
-				backgroundColor: "white",
+				backgroundColor: "#f3f4f6", // gray-100
+				textAlign: "center",
 			}}
 		>
-			<Paper
-				p="lg"
-				radius="md"
+			<Title
+				order={1}
+				size="2xl"
 				style={{
-					textAlign: "center",
-					backgroundColor: currentDate.isDateChanging ? "#dcfce7" : "#eff6ff", // green-100 : blue-50
+					color: currentDate.isDateChanging ? "#14532d" : "#1e40af", // green-800 : blue-800
 					transform: currentDate.isDateChanging ? "scale(1.05)" : "scale(1)",
 					transition: "all 300ms ease",
 				}}
 			>
-				<Title
-					order={1}
-					size="2xl"
-					style={{
-						color: currentDate.isDateChanging ? "#14532d" : "#1e40af", // green-800 : blue-800
-					}}
-				>
-					{format(currentDate.date, "yyyy/M/d", { locale: ja })} (
-					{format(currentDate.date, "E", { locale: ja })})
-				</Title>
-			</Paper>
+				{format(currentDate.date, "yyyy/M/d", { locale: ja })} (
+				{format(currentDate.date, "E", { locale: ja })})
+			</Title>
 
 			{/* 設定ボタン */}
 			<ActionIcon
@@ -55,6 +46,6 @@ export const CalendarHeader = () => {
 			>
 				<span style={{ fontSize: "1.125rem" }}>⚙️</span>
 			</ActionIcon>
-		</Paper>
+		</Box>
 	);
 };

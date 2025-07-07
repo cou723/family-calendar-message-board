@@ -1,10 +1,6 @@
 import { format } from "date-fns";
-import {
-	SafeStorage,
-	safeAsync,
-	safeFetch,
-	safeSync,
-} from "../shared/safeStorage";
+import { AppStorage } from "../shared/appStorage";
+import { safeAsync, safeFetch, safeSync } from "../shared/safeStorage";
 import type { CalendarEvent, FamilyMember } from "../shared/types";
 
 // Googleカレンダーのみ対応
@@ -25,7 +21,7 @@ export type CalendarApiError = {
 const handleAuthenticationError = (_calendarId?: string): void => {
 	console.warn("🔐 Authentication error detected. Clearing access token.");
 	// アクセストークンを削除
-	SafeStorage.removeItem("google-access-token");
+	AppStorage.clearGoogleAuthData();
 	// 認証状態をリセット
 	window.dispatchEvent(
 		new CustomEvent("auth-state-changed", { detail: { authenticated: false } }),
