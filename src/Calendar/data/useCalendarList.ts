@@ -27,7 +27,7 @@ export const useCalendarList = () => {
 
 	return useQuery({
 		queryKey: ["calendarList", user?.access_token],
-		queryFn: () => fetchCalendarList(user!.access_token),
+		queryFn: () => fetchCalendarList(user?.access_token || ""),
 		staleTime: 5 * 60 * 1000, // 5分間はキャッシュを使用
 		retry: 2,
 		enabled: !!user?.access_token,
