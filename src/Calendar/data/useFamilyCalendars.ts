@@ -8,29 +8,29 @@ const getDefaultFamilyCalendars = (): FamilyCalendarConfig[] => [
 		id: "father",
 		member: "father",
 		calendarIds: [],
-		name: "お父さん",
-		color: "#1d4ed8", // より濃い青
+		name: "父",
+		color: "#93c5fd", // 薄い青
 	},
 	{
 		id: "mother",
 		member: "mother",
 		calendarIds: [],
-		name: "お母さん",
-		color: "#dc2626", // より濃い赤
+		name: "母",
+		color: "#fca5a5", // 薄い赤
 	},
 	{
 		id: "son1",
 		member: "son1",
 		calendarIds: [],
-		name: "長男",
-		color: "#059669", // より濃い緑
+		name: "子1",
+		color: "#86efac", // 薄い緑
 	},
 	{
 		id: "son2",
 		member: "son2",
 		calendarIds: [],
-		name: "次男",
-		color: "#d97706", // より濃いオレンジ
+		name: "子2",
+		color: "#fed7aa", // 薄いオレンジ
 	},
 ];
 
