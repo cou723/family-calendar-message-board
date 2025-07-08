@@ -1,4 +1,10 @@
-import { createContext, type ReactNode, useContext, useState } from "react";
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useState,
+} from "react";
 
 interface DateNavigationContextType {
 	currentDate: {
@@ -23,8 +29,33 @@ interface DateNavigationProviderProps {
 export const DateNavigationProvider = ({
 	children,
 }: DateNavigationProviderProps) => {
-	const [currentDate, setCurrentDate] = useState(new Date());
+	const [currentDate, setCurrentDate] = useState(() => new Date());
 	const [isDateChanging, setIsDateChanging] = useState(false);
+
+	// 日付が変わったら自動的に当日に更新
+	useEffect(() => {
+		const checkDateChange = () => {
+			const now = new Date();
+			const currentDateOnly = new Date(
+				currentDate.getFullYear(),
+				currentDate.getMonth(),
+				currentDate.getDate(),
+			);
+			const nowDateOnly = new Date(
+				now.getFullYear(),
+				now.getMonth(),
+				now.getDate(),
+			);
+
+			if (currentDateOnly.getTime() !== nowDateOnly.getTime()) {
+				setCurrentDate(now);
+			}
+		};
+
+		// 15分ごとに日付変更をチェック
+		const interval = setInterval(checkDateChange, 15 * 60 * 1000);
+		return () => clearInterval(interval);
+	}, [currentDate]);
 
 	const goToPreviousDay = () => {
 		setIsDateChanging(true);
