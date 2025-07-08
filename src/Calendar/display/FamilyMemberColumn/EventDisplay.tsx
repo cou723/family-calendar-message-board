@@ -8,6 +8,7 @@ interface EventDisplayProps {
 	cellHeight: number;
 	headerHeight: number;
 	events: CalendarEvent[];
+	onEventClick?: (event: CalendarEvent) => void;
 }
 
 export const EventDisplay = ({
@@ -16,6 +17,7 @@ export const EventDisplay = ({
 	cellHeight,
 	headerHeight,
 	events,
+	onEventClick,
 }: EventDisplayProps) => {
 	return (
 		<>
@@ -53,17 +55,18 @@ export const EventDisplay = ({
 								right: "4px",
 								top: `${topPosition}px`,
 								height: `${height}px`,
-								minHeight: `${Math.max(24, cellHeight * 0.8)}px`,
+								minHeight: `${Math.max(32, cellHeight * 0.9)}px`,
 								backgroundColor: event.color,
 								color: textColor,
 								borderRadius: "4px",
-								padding: "8px 12px",
+								padding: "0",
 								boxShadow:
 									"0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
 								zIndex: 10,
 								overflow: "hidden",
-								border: "1px solid #e5e7eb",
+								cursor: onEventClick ? "pointer" : "default",
 							}}
+							onClick={() => onEventClick?.(event)}
 						>
 							<Text
 								fw={600}
