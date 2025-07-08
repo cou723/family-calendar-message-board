@@ -1,5 +1,5 @@
+import { CalendarFooter } from "./components/CalendarFooter";
 import { CalendarGrid } from "./components/CalendarGrid";
-import { CalendarHeader } from "./components/CalendarHeader";
 import { EventDetailModal } from "./components/EventDetailModal";
 import { useEventDetailModal } from "./components/EventDetailModal/useEventDetailModal";
 import { TodayButton } from "./components/TodayButton";
@@ -14,7 +14,7 @@ export const Calendar = () => {
 		<DateNavigationProvider>
 			<TouchNavigationWrapper>
 				<CalendarGrid onEventClick={handleEventClick} />
-				<CalendarHeader />
+				<CalendarFooter />
 				<TodayButton />
 			</TouchNavigationWrapper>
 			<EventDetailModal

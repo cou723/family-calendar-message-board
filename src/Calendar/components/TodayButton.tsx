@@ -12,7 +12,7 @@ export const TodayButton = () => {
 			onClick={actions.goToToday}
 			style={{
 				position: "fixed",
-				bottom: 120, // CalendarHeaderの高さ分上に移動
+				bottom: 120, // CalendarFooterの高さ分上に移動
 				right: 24,
 				backgroundColor: "white",
 				border: "2px solid #bfdbfe", // blue-200

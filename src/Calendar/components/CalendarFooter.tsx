@@ -1,12 +1,31 @@
 import { ActionIcon, Box, Title } from "@mantine/core";
-import { format } from "date-fns";
+import { differenceInDays, format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
 import { useDateNavigation } from "../shared/useDateNavigation";
 
-export const CalendarHeader = () => {
+const getRelativeDateLabel = (date: Date): string => {
+	const now = new Date();
+	const diffDays = differenceInDays(date, now);
+
+	switch (diffDays) {
+		case 0:
+			return "今日";
+		case -1:
+			return "昨日";
+		case 1:
+			return "明日";
+		case 2:
+			return "明後日";
+		default:
+			return "";
+	}
+};
+
+export const CalendarFooter = () => {
 	const { currentDate } = useDateNavigation();
 	const navigate = useNavigate();
+	const relativeLabel = getRelativeDateLabel(currentDate.date);
 
 	return (
 		<Box
@@ -27,6 +46,7 @@ export const CalendarHeader = () => {
 					transition: "all 300ms ease",
 				}}
 			>
+				{relativeLabel && `${relativeLabel} `}
 				{format(currentDate.date, "yyyy/M/d", { locale: ja })} (
 				{format(currentDate.date, "E", { locale: ja })})
 			</Title>
