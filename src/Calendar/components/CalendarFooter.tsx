@@ -6,7 +6,14 @@ import { useDateNavigation } from "../shared/useDateNavigation";
 
 const getRelativeDateLabel = (date: Date): string => {
 	const now = new Date();
-	const diffDays = differenceInDays(date, now);
+	// 時刻を00:00:00にリセットして日付のみで比較
+	const dateOnly = new Date(
+		date.getFullYear(),
+		date.getMonth(),
+		date.getDate(),
+	);
+	const nowOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+	const diffDays = differenceInDays(dateOnly, nowOnly);
 
 	switch (diffDays) {
 		case 0:
