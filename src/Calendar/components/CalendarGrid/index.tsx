@@ -3,12 +3,16 @@ import { useCalendarEvents } from "../../data/queries/useCalendarEvents";
 import { EventsLoadingPlaceholder } from "../../display/EventsLoadingPlaceholder";
 import { FamilyMemberColumn } from "../../display/FamilyMemberColumn";
 import { TimeColumn } from "../../display/TimeColumn";
-import type { FamilyMember } from "../../shared/types";
+import type { CalendarEvent, FamilyMember } from "../../shared/types";
 import { useDateNavigation } from "../../shared/useDateNavigation";
 import { useSettings } from "../../shared/useSettings";
 import { useCellLayout } from "./useCellLayout";
 
-export const CalendarGrid = () => {
+interface CalendarGridProps {
+	onEventClick?: (event: CalendarEvent) => void;
+}
+
+export const CalendarGrid = ({ onEventClick }: CalendarGridProps) => {
 	const { timeRange, familyCalendars } = useSettings();
 	const { cellHeight, headerHeight } = useCellLayout(
 		timeRange.startHour,
@@ -62,6 +66,7 @@ export const CalendarGrid = () => {
 						familyMember={familyMember}
 						cellLayout={cell}
 						events={events || []}
+						onEventClick={onEventClick}
 					/>
 				))
 			)}

@@ -12,12 +12,14 @@ interface FamilyMemberColumnProps {
 	familyMember: FamilyMember;
 	cellLayout: CellLayout;
 	events: CalendarEvent[];
+	onEventClick?: (event: CalendarEvent) => void;
 }
 
 export const FamilyMemberColumn = ({
 	familyMember,
 	cellLayout,
 	events,
+	onEventClick,
 }: FamilyMemberColumnProps) => {
 	const { startHour, endHour, cellHeight, headerHeight } = cellLayout;
 	const { member, name, color } = familyMember;
@@ -86,6 +88,7 @@ export const FamilyMemberColumn = ({
 				cellHeight={cellHeight}
 				headerHeight={headerHeight}
 				events={events}
+				onEventClick={onEventClick}
 			/>
 		</Box>
 	);
