@@ -1,4 +1,4 @@
-import { Box, Center, Loader, Overlay, Stack, Text } from "@mantine/core";
+import { Box, Center, Loader, Overlay, Text } from "@mantine/core";
 import type { CellLayout, FamilyMember } from "../shared/types";
 
 interface EventsLoadingPlaceholderProps {
@@ -63,12 +63,7 @@ export const EventsLoadingPlaceholder = ({
 						}}
 					>
 						<Center h="100%">
-							<Stack gap="sm" align="center">
-								<Loader color="blue" size="md" />
-								<Text size="sm" c="blue" fw={500}>
-									読み込み中...
-								</Text>
-							</Stack>
+							<Loader color="blue" size="md" />
 						</Center>
 					</Overlay>
 				</Box>
